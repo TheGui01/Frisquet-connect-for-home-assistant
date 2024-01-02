@@ -1,0 +1,44 @@
+2023-12-31 12:16:21.581 WARNING (Thread-2 (_do_shutdown)) [homeassistant.util.executor] Thread[SyncWorker_2] is still running at shutdown: File "/usr/local/lib/python3.11/threading.py", line 995, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.11/concurrent/futures/thread.py", line 83, in _worker
+    work_item.run()
+  File "/usr/local/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.11/site-packages/homeassistant/requirements.py", line 110, in _install_requirements_if_missing
+    if pkg_util.is_installed(req) or _install_with_retry(req, kwargs):
+  File "/usr/local/lib/python3.11/site-packages/homeassistant/requirements.py", line 98, in _install_with_retry
+    if pkg_util.install_package(requirement, **kwargs):
+  File "/usr/local/lib/python3.11/site-packages/homeassistant/util/package.py", line 100, in install_package
+    _, stderr = process.communicate()
+  File "/usr/local/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+  File "/usr/local/lib/python3.11/subprocess.py", line 2108, in _communicate
+    ready = selector.select(timeout)
+  File "/usr/local/lib/python3.11/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+2023-12-31 12:16:21.614 ERROR (MainThread) [root] Uncaught exception
+Traceback (most recent call last):
+  File "/usr/local/bin/hass", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/homeassistant/__main__.py", line 209, in main
+    exit_code = runner.run(runtime_conf)
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/homeassistant/runner.py", line 188, in run
+    return loop.run_until_complete(setup_and_run_hass(runtime_config))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 640, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 607, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 1884, in _run_once
+    event_list = self._selector.select(timeout)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/selectors.py", line 468, in select
+    fd_event_list = self._selector.poll(timeout, max_ev)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
