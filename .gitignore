@@ -1,3 +1,4 @@
+.gitignore
 automations.yaml
 configuration.yaml
 home-assistant_v2.db
