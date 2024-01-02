@@ -1,0 +1,24 @@
+{
+    "title": "Frisquest Connect",
+    "config": {
+        "flow_title": "Frisquest Connect configuration",
+        "step": {
+            "user": {
+                "title": "Vos infos de connexion",
+                "description": "Entrez vos identifiants et mot de passe de votre application frisquet Connect",
+                "data": {
+                    "email": "E-mail (Identifiant)",
+                    "password": "mot de passe"
+                }
+            },
+            "user2": {
+                "title": "Vos infos de connexion",
+                "description": "Identifiants ou mot de passe incorrect veuillez ressayer",
+                "data": {
+                    "email": "E-mail (Identifiant)",
+                    "password": "mot de passe"
+                }
+            }
+        }
+    }
+}

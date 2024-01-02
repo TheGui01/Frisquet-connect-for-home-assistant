@@ -1,0 +1,16 @@
+automations.yaml
+configuration.yaml
+home-assistant_v2.db
+home-assistant.log
+home-assistant.log.1
+scenes.yaml
+scripts.yaml
+secrets.yaml
+blueprints/automation/homeassistant/motion_light.yaml
+blueprints/automation/homeassistant/notify_leaving_zone.yaml
+blueprints/script/homeassistant/confirmable_notification.yaml
+custom_components/frisquet_connect/__pycache__/__init__.cpython-311.pyc
+custom_components/frisquet_connect/__pycache__/climate.cpython-311.pyc
+custom_components/frisquet_connect/__pycache__/config_flow.cpython-311.pyc
+custom_components/frisquet_connect/__pycache__/const.cpython-311.pyc
+custom_components/frisquet_connect/__pycache__/frisquetAPI.cpython-311.pyc
