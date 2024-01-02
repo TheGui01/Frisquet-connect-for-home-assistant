@@ -17,7 +17,7 @@ Several Zones will be supported in a futur version
 
 - HVAC Modes : Auto and Chauffe are activated. Please consider them respectively as Auto and Not Auto
 - Preset Modes :
-    - Réduit & Confort : Cominated with HVAC Mode Auto means you are in Auto and the preset decribes in which mode you are currently setup. Any switch between Réduit and Confort will activate a derogation mode : HVAC Mode will sitch in Chauffe. This derogation will be keep until the next cycle
+    - Réduit & Confort : Cominated with HVAC Mode Auto means you are in Auto and the preset decribes in which mode you are currently setup. Any switch between Réduit and Confort will activate a derogation mode : HVAC Mode will switch in Chauffe. This derogation will be kept until the next cycle.
 
     - Réduit Permanent, Confort Permanent, Hors Gel : If chosen, HVAC Mode = Chauffe. Switch back HVAC mode to Auto to stop the "Permanent" mode
 
