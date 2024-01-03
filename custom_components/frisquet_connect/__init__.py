@@ -15,6 +15,7 @@ from .const import (
     HVACAction,
     HVACMode,
 )
+from homeassistant.const import Platform
 
 
 from homeassistant.const import (
@@ -38,11 +39,7 @@ def generate_uuid() -> str:
 
 def add_device_information(config: dict) -> dict:
     """Add device information to the configuration."""
-    #if not CONF_ENTRY_ID in config:
-     #   config[CONF_ENTRY_ID] = generate_uuid(config[CONF_ENTRY_ID])
 
-    #if not CONF_ENTRY_ID in config:
-    #    config[CONF_ENTRY_ID] = generate_uuid()
 
     _LOGGER.debug("add_device_info in init.py config:'%s'",config)
 
@@ -84,7 +81,7 @@ async def async_setup_entry (hass: HomeAssistant, entry: ConfigEntry) -> bool:  
     hass.data[DOMAIN][entry.unique_id]  = my_api
 
     # Enregistrement de l'écouteur de changement 'update_listener'
-
+    #for x  in PLATFORMS:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True

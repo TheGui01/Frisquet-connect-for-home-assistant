@@ -10,7 +10,7 @@ from homeassistant.components.climate.const import (
     HVACAction,
     HVACMode,
     PRESET_COMFORT,
-    PRESET_BOOST,
+    PRESET_BOOST
 
 
 
@@ -27,7 +27,6 @@ from homeassistant.helpers.entity_platform import (
 
 )
 from homeassistant.components.sensor import (
-    SensorEntity,
     SensorDeviceClass,
     SensorStateClass,
     SensorEntityDescription,
@@ -53,7 +52,7 @@ from datetime import timedelta
 SCAN_INTERVAL = timedelta(seconds=300)
 import homeassistant.helpers.config_validation as cv
 
-
+#from .sensor import FrisquetThermometer
 from .const import DOMAIN,AUTH_API,API_URL,DEVICE_MANUFACTURER,ORDER_API
 
 _LOGGER = logging.getLogger(__name__)
@@ -72,8 +71,12 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
 
     _LOGGER.debug("In Climate.py asyncsetup entry2 %s'", coordinator.my_api)
     entity = FrisquetConnectEntity(entry,coordinator.my_api)
-
     async_add_entities([entity],update_before_add=False)
+
+    #hass.create_task(hass.config_entries.async_forward_entry_setup(
+    #entry, "sensor"))
+    #entityTemp = FrisquetThermometer(entry,coordinator.my_api)
+    #async_add_entities([entityTemp],update_before_add=False)
 
 
 async def async_setup_cleanup( hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
@@ -87,7 +90,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity ) -> None:
         """Initisalisation de notre entité"""
-        _LOGGER.debug("In Climate.py__init__")#["entry_id"])
+        _LOGGER.debug("Climate INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         _LOGGER.debug("Init Entity='%s'", coordinator.data)
         #self.coordinator = coordinator
@@ -108,7 +111,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.Derogation=coordinator.data["DERO"]
         self._attr_preset_modes = self.DefineavAilablePresetmodes(coordinator.data["boost_disponible"] )
         self._attr_preset_mode= self.defPreset(FrisquetConnectEntity.Selecteur, FrisquetConnectEntity.Mode,coordinator.data["ACTIVITE_BOOST"],FrisquetConnectEntity.Derogation )
-        self._attr_hvac_mode =  self.modeFrisquetToHVAC(FrisquetConnectEntity.Mode,FrisquetConnectEntity.Derogation,self._attr_preset_mode)
+        self._attr_hvac_mode =  self.modeFrisquetToHVAC(FrisquetConnectEntity.Mode,FrisquetConnectEntity.Derogation,self._attr_preset_mode,coordinator.data["CAMB"] / 10,self.coordinator.data["TAMB"] /10)
 
         FrisquetConnectEntity.Preset_mode = self._attr_preset_mode
         _LOGGER.debug("preset mode : '%s", self._attr_preset_mode)
@@ -122,6 +125,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.Devicename=config_entry.data["chaudiere"],
         FrisquetConnectEntity.Devicemodel=config_entry.data["gamme"],
         FrisquetConnectEntity.Deviceserial_number=coordinator.data["identifiant_chaudiere"]
+        #FrisquetConnectEntity.CoordinatorData = coordinator
         self._user_input.update(coordinator.data)
 
     def update(self):
@@ -132,6 +136,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.target_temperature= FrisquetConnectEntity.defConsigneTemp(self,self.data["CONS_CONF"] / 10,self.data["CONS_RED"] / 10,self.data["CONS_HG"] / 10)
         FrisquetConnectEntity.current_temperature= self.data["TAMB"]/10
         FrisquetConnectEntity.hvac_mode =  self.hvac_mode
+
 
 
     #@property
@@ -300,14 +305,16 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         elif FrisquetConnectEntity.Preset_mode == "Hors Gel":
             return    CONS_HG
 
-    def modeFrisquetToHVAC(self, mode: int, derog: bool,preset_mode):
+    def modeFrisquetToHVAC(self, mode: int, derog: bool,preset_mode,CAMB,TAMB):
         _LOGGER.debug("modeFrisquetToHVAC : derog %s & preset %s", preset_mode, derog)
         if derog == True :
             return HVACMode.HEAT
         elif derog == False and preset_mode != "Hors Gel" and preset_mode != "Confort Permanent" and preset_mode != "Réduit Permanent" :
             return HVACMode.AUTO
 
-        else: return HVACMode.HEAT
+        elif CAMB > TAMB:
+            return HVACMode.HEAT
+        else: return HVACMode.OFF
 
 
 async def OrderToFrisquestAPI(self,key,valeur):
@@ -348,12 +355,11 @@ class MyCoordinator(DataUpdateCoordinator):
             # Name of the data. For logging purposes.
             name= "My sensor",
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=600),
+            update_interval=timedelta(seconds=300),
 
         )
         _LOGGER.debug(    "_user_input in mycoordinator2'%s'",my_api)
         self.my_api = my_api
-        #self.PoolFrisquetAPI(FrisquetConnectEntity._user_input)
 
     async def _async_update_data(self):
         _LOGGER.debug( "in _async_update_data mYCOORDINATR" )
@@ -370,13 +376,6 @@ class MyCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug(    "in mycoordinator _async_update_data'%s' ", FrisquetConnectEntity._user_input )
                 return await self.my_api.getTokenAndInfo()
 
-                #return await FrisquetGetInfo.getTokenAndInfo()#,FrisquetConnectEntity._user_input)
-                #self.mydata = await self.PoolFrisquetAPI(self,FrisquetConnectEntity._user_input)
         except: #NameError as err:
             _LOGGER.debug(    "in mycoordinator _async_update_data ERROR") #:'%s'", err)
-            #raise ConfigEntryAuthFailed from err
-            # Raising ConfigEntryAuthFailed will cancel future updates
-            # and start a config flow with SOURCE_REAUTH (async_step_reauth)
-            #raise ConfigEntryAuthFailed from err
-        #except ApiError as err:
-            #raise UpdateFailed(f"Error communicating with API: {err}")
+
