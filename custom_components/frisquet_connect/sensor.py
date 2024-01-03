@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_platform import (
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,)
-from .climate import MyCoordinator
+from .climate import MyCoordinator, FrisquetConnectEntity
 from .const import DOMAIN
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -65,5 +65,5 @@ class FrisquetThermometer(SensorEntity):
         return SensorStateClass.MEASUREMENT
 
     def update(self):
-        _LOGGER.debug("update in sensor.py'%s", self.data)
-        FrisquetThermometer._attr_state = self.data["TAMB"]/10
+        _LOGGER.debug("update in sensor.py")
+        FrisquetThermometer._attr_state = FrisquetConnectEntity.current_temperature
