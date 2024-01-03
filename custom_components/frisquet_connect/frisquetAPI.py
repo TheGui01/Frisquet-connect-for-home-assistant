@@ -2,7 +2,7 @@ import logging
 import aiohttp
 from .const import AUTH_API,API_URL
 from.climate import  FrisquetConnectEntity
-#from .sensor import FrisquetThermometer
+from .sensor import FrisquetThermometer
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import (
     AddEntitiesCallback,)
@@ -37,7 +37,7 @@ class FrisquetGetInfo:
       self.Preset_mode = FrisquetConnectEntity.defPreset(self,self.data["SELECTEUR"],self.data["MODE"],self.data["ACTIVITE_BOOST"],self.data["DERO"])
       self.hvac_mode =   FrisquetConnectEntity.modeFrisquetToHVAC(self,self.data["MODE"],self.data["DERO"],self.Preset_mode,self.data["CAMB"],self.data["TAMB"])
       FrisquetConnectEntity.update(self)
-      #FrisquetThermometer.update(self)
+      FrisquetThermometer.update(self)
 
       #self.async_add_entities([entity],update_before_add=False)
     def addentity(self, EntityCallback : AddEntitiesCallback ):

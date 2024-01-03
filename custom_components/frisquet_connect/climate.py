@@ -101,7 +101,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self._attr_name = coordinator.data["nom"]
 
         self._attr_current_temperature= coordinator.data["TAMB"] / 10
-
+        FrisquetConnectEntity.TAMB= coordinator.data["TAMB"] / 10
         self._attr_temperature_unit= "°C"
         self._attr_target_temperature_low = coordinator.data["CONS_RED"] / 10
         self._attr_target_temperature_high = coordinator.data["CONS_CONF"] / 10
@@ -136,6 +136,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.target_temperature= FrisquetConnectEntity.defConsigneTemp(self,self.data["CONS_CONF"] / 10,self.data["CONS_RED"] / 10,self.data["CONS_HG"] / 10)
         FrisquetConnectEntity.current_temperature= self.data["TAMB"]/10
         FrisquetConnectEntity.hvac_mode =  self.hvac_mode
+        FrisquetConnectEntity.TAMB= self.data["TAMB"]/10
 
 
 

@@ -65,5 +65,5 @@ class FrisquetThermometer(SensorEntity):
         return SensorStateClass.MEASUREMENT
 
     def update(self):
-        _LOGGER.debug("update in sensor.py")
-        FrisquetThermometer._attr_state = FrisquetConnectEntity.current_temperature
+        _LOGGER.debug("update in sensor.py target temp : %s",FrisquetConnectEntity.TAMB)
+        FrisquetThermometer._attr_state = FrisquetConnectEntity.TAMB
