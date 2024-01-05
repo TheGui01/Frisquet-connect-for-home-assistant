@@ -135,6 +135,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.preset_mode= self.Preset_mode
         FrisquetConnectEntity.target_temperature= FrisquetConnectEntity.defConsigneTemp(self,self.data["CONS_CONF"] / 10,self.data["CONS_RED"] / 10,self.data["CONS_HG"] / 10)
         FrisquetConnectEntity.current_temperature= self.data["TAMB"]/10
+        FrisquetConnectEntity._attr_current_temperature= self.data["TAMB"]/10
         FrisquetConnectEntity.hvac_mode =  self.hvac_mode
         FrisquetConnectEntity.TAMB= self.data["TAMB"]/10
 
