@@ -239,30 +239,30 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         #dt = dataTopush()
         #await self.coordinator.async_request_refresh()
 
-    async def async_set_preset_mode(self, **kwargs):
-            _LOGGER.debug("async_set_preset_mode requested '%s",kwargs)
+    async def async_set_preset_mode(self, preset_mode):
+            _LOGGER.debug("async_set_preset_mode requested '%s",preset_mode)
             _LOGGER.debug("async_set_preset_mode current'%s",FrisquetConnectEntity.Preset_mode)
             if FrisquetConnectEntity.Selecteur != 5: #on repasse en auto
                 mode = int(5)
                 _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
                 await OrderToFrisquestAPI(self,_key,mode)
-            if kwargs['preset_mode'] == 'Réduit Permanent':
+            if preset_mode == 'Réduit Permanent':
                 mode = int(7)
                 _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
                 FrisquetConnectEntity.Preset_mode = 'Réduit Permanent'
-            elif kwargs['preset_mode'] == 'Comfort Permanent':
+            elif preset_mode == 'Comfort Permanent':
                 mode = int(6)
                 _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
                 FrisquetConnectEntity.Preset_mode = 'Comfort Permanent'
-            elif kwargs['preset_mode'] == 'Réduit':
+            elif preset_mode == 'Réduit':
                 mode = int(7)
                 _key = "MODE_DERO"
                 FrisquetConnectEntity.Preset_mode = 'Réduit'
-            elif kwargs['preset_mode'] == 'Comfort':
+            elif preset_mode == 'Comfort':
                 mode = int(6)
                 _key = "MODE_DERO"
                 FrisquetConnectEntity.Preset_mode = 'Comfort'
-            elif kwargs['preset_mode'] == 'Hors Gel':
+            elif preset_mode == 'Hors Gel':
                 mode = int(8)
                 _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
                 FrisquetConnectEntity.Preset_mode = 'Hors Gel'
@@ -290,7 +290,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             else: return PRESET_COMFORT
         elif selecteur == 7:
             if mode == 7:
-                return "Réduit Permanant"
+                return "Réduit Permanent"
             else: return "Réduit"
         elif  selecteur == 8:
             return "Hors Gel"
