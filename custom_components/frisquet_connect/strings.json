@@ -10,14 +10,6 @@
                     "email": "E-mail (Identifiant)",
                     "password": "mot de passe"
                 }
-            },
-            "user2": {
-                "title": "Vos infos de connexion",
-                "description": "Identifiants ou mot de passe incorrect veuillez ressayer",
-                "data": {
-                    "email": "E-mail (Identifiant)",
-                    "password": "mot de passe"
-                }
             }
         }
     }

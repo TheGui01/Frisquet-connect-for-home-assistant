@@ -1,85 +1,91 @@
 import logging
 import aiohttp
+
 from .const import AUTH_API,API_URL
-from.climate import  FrisquetConnectEntity
-from .sensor import FrisquetThermometer
+#from .climate import FrisquetConnectEntity
+
+
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity_platform import (
-    AddEntitiesCallback,)
 _LOGGER = logging.getLogger(__name__)
 class FrisquetGetInfo:
 
-    def __init__(self, userinput: dict ):#, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+    def __init__(self,  entry: ConfigEntry):#, async_add_entities: AddEntitiesCallback):
       _LOGGER.debug("__init__ Frisquet API: %s", self)
-      self._zones: dict={}
       self.data: dict = {}
-
-      self._url1 =AUTH_API
-      self.headers = {
-                'Content-Type': 'application/json'
-                }
-
-      self.Initjson_data = {
-                "locale": "fr",
-                "email": userinput["email"],
-                "password": userinput["password"],
-                "type_client": "IOS",
-                }
-      #self.entry = entry
-      #self.async_add_entities = async_add_entities
 
     async def async_request_refresh(self):
       _LOGGER.debug("async_request_refresh Frisquet API: %s",self.data)
-      self.data
-     # DataApi=  await self.getTokenAndInfo()
-      #entity = FrisquetConnectEntity(self.entry,DataApi)
-      await self.getTokenAndInfo()
-      self.Preset_mode = FrisquetConnectEntity.defPreset(self,self.data["SELECTEUR"],self.data["MODE"],self.data["ACTIVITE_BOOST"],self.data["DERO"])
-      self.hvac_mode =   FrisquetConnectEntity.modeFrisquetToHVAC(self,self.data["MODE"],self.data["DERO"],self.Preset_mode,self.data["CAMB"],self.data["TAMB"])
-      FrisquetConnectEntity.update(self)
-      FrisquetThermometer.update(self)
+      #data= self.data[FrisquetConnectEntity.idx]
+      #self.data[FrisquetConnectEntity.idx] = await self.getTokenAndInfo(data,FrisquetConnectEntity.idx)
+      #if float(self.data[FrisquetConnectEntity.idx]["date_derniere_remontee"]) > float(FrisquetConnectEntity.TimeLastOrder):
+      #  _LOGGER.debug("async_request_refresh Frisquet API Update in progress")
+      #  FrisquetConnectEntity._attr_current_temperature= self.data[FrisquetConnectEntity.idx]["TAMB"] / 10
+      #  FrisquetConnectEntity._attr_preset_mode= FrisquetConnectEntity.defPreset(self,self.data[FrisquetConnectEntity.idx]["SELECTEUR"], self.data[FrisquetConnectEntity.idx]["MODE"],self.data[FrisquetConnectEntity.idx]["ACTIVITE_BOOST"],self.data[FrisquetConnectEntity.idx]["DERO"] )
+      #  FrisquetConnectEntity._attr_hvac_mode =  FrisquetConnectEntity.modeFrisquetToHVAC(self,self.data[FrisquetConnectEntity.idx]["MODE"],self.data[FrisquetConnectEntity.idx]["DERO"],FrisquetConnectEntity._attr_preset_mode,self.data[FrisquetConnectEntity.idx]["CAMB"] / 10,self.data[FrisquetConnectEntity.idx]["TAMB"] /10)
+      #  FrisquetConnectEntity._attr_target_temperature= FrisquetConnectEntity.defConsigneTemp(self,FrisquetConnectEntity._attr_preset_mode,self.data[FrisquetConnectEntity.idx]["CONS_CONF"] / 10,self.data[FrisquetConnectEntity.idx]["CONS_RED"] / 10,self.data[FrisquetConnectEntity.idx]["CONS_HG"] / 10)
+      #else:
+      #   _LOGGER.debug("async_request_refresh Frisquet API No Update")
+      #   pass
 
-      #self.async_add_entities([entity],update_before_add=False)
-    def addentity(self, EntityCallback : AddEntitiesCallback ):
-         pass
+    async def async_add_listener(self,pos2,pos3):
+      _LOGGER.debug("async_add_listener Frisquet API: %s  pos2: %s  pos3:  %s",self.data, pos2, pos3)
 
-    async def async_generate_attributes(self):
-          _LOGGER.debug("async_generate_attributesFrisquet API")
-          pass
+    async def last_update_success(self,pos2,pos3):
+      _LOGGER.debug("last_update_success Frisquet API: %s  pos2: %s  pos3:  %s",self.data, pos2, pos3)
+    async def getTokenAndInfo(self,data,idx):
+        self.data: dict = {}
+        headers = {
+                'Content-Type': 'application/json'
+                }
+        Initjson_data = {
+                "locale": "fr",
+                "email": data["email"],
+                "password": data["password"],
+                "type_client": "IOS",
+                }
+        email = data["email"]
+        password = data["password"]
 
-    async def last_update_success(self):
-          _LOGGER.debug("last_update_success Frisquet API")
-          pass
-
-    async def getTokenAndInfo(self):
-        self._session = aiohttp.ClientSession(headers="")
+        _session = aiohttp.ClientSession(headers="")
         _LOGGER.debug("In getToken and info Frisquet API")
-        async with await self._session.post(url=self._url1,headers=self.headers,json= self.Initjson_data) as resp:
-
+        async with await _session.post(url=AUTH_API,headers=headers,json= Initjson_data) as resp:
                     #_LOGGER.debug("In getToken and info json data 1 '%s'" ,self.Initjson_data)
-                    self.json_data = await resp.json()
+                    json_data = await resp.json()
                     #_LOGGER.debug("In getToken and info json data 2 '%s'" ,self.json_data)
-                    self._url = API_URL+ self.json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"?token="+self.json_data["token"]
-                    await self._session.close()
+                    _url = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"?token="+json_data["token"]
+                    await _session.close()
 
-                    self._session = aiohttp.ClientSession(headers="")
-                    _LOGGER.debug("In PoolFrisquestAPI with url :'%s",self._url)
-                    async with await self._session.get(url=self._url) as resp:
+                    _session = aiohttp.ClientSession(headers="")
+                    _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
+                    async with await _session.get(url=_url) as resp:
                         response = await resp.json()
                         _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
-                        self._zones= response["zones"][0]
-                        self.data = response["zones"][0]["carac_zone"]
+
+                        for i in range(len(response["zones"])):
+                          if response["zones"][i]["numero"]!= "":
+                            self.data["zone"+str(i+1)]:dict = {}
+                            self.data["zone"+str(i+1)] = response["zones"][i]["carac_zone"]
+                            self.data["zone"+str(i+1)]["boost_disponible"] = response["zones"][i]["boost_disponible"]
+                            self.data["zone"+str(i+1)]["identifiant"] = response["zones"][i]["identifiant"]
+                            self.data["zone"+str(i+1)]["numero"] = response["zones"][i]["numero"]
+                            self.data["zone"+str(i+1)]["nom"] = response["zones"][i]["nom"]
+
+                            #data["carac_zone"+str(i+1)]: dict= {}
+                            #data["carac_zone"+str(i+1)]=response["zones"][i]["carac_zone"]
+                            self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
+                            self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
+                            self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
+                            self.data["zone"+str(i+1)]["nomInstall"] = response["nom"]
+                            self.data["zone"+str(i+1)]["token"]=json_data["token"]
+                            self.data["zone"+str(i+1)]["email"]= email
+                            self.data["zone"+str(i+1)]["password"]= password
+                            #self.data["zone"+str(i+1)]
 
 
-                        self.data["boost_disponible"]=self._zones["boost_disponible"]
-                        self.data["numero"] = self._zones["numero"]
-                        self.data["nom"] = self._zones["nom"]
-                        self.data["identifiant_chaudiere"] = self.json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]
-                        self.data["token"]=self.json_data["token"]
-                        #_caraczone["password"] = config_entries["password"]
-                        await self._session.close()
-                        #return FrisquetConnectEntity.updateFrisquetAttr(self,self.data)
-                        #return self.data
 
-        #except:
-        #     _LOGGER("PoolFrisquetAPI Failed: %s", response)
+                        self.data["ecs"] = response["ecs"]
+
+                        await _session.close()
+                        if idx == 0:
+                          return self.data
+                        else: return self.data[idx]
