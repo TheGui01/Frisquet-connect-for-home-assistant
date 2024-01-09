@@ -2,6 +2,19 @@
 [![GitHub Latest Release][releases_shield]][latest_release]
 [![GitHub All Releases][downloads_total_shield]][releases]
 
+
+
+[hacs_shield]: https://img.shields.io/static/v1.svg?label=HACS&message=Custom&style=popout&color=orange&labelColor=41bdf5&logo=HomeAssistantCommunityStore&logoColor=white
+[hacs]: https://hacs.xyz/docs/faq/custom_repositories
+
+[latest_release]: https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/latest
+[releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=release
+
+
+
+[releases]: https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/latest
+[downloads_total_shield]: https://img.shields.io/github/downloads/TheGui01/Frisquet-connect-for-home-assistant/total
+
 # Frisquet Connect For Homme Assistant
 
 
