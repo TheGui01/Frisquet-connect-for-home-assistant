@@ -1,3 +1,6 @@
+[![HACS Custom][hacs_shield]][hacs]
+[![GitHub Latest Release][releases_shield]][latest_release]
+[![GitHub All Releases][downloads_total_shield]][releases]
 
 # Frisquet Connect For Homme Assistant
 
