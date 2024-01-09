@@ -70,13 +70,13 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
         self.data[self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.data[self.idx],self.idx)
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
-            _LOGGER.debug("async_request_refresh Frisquet API Update in progress")
+            _LOGGER.debug("In Climate.py async update in progress")
             self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10
             self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
             self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
         else:
-         _LOGGER.debug("async_request_refresh Frisquet API No Update")
+         _LOGGER.debug("In Climate.py async update No Update")
          pass
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity ) -> None:
@@ -253,7 +253,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
     def modeFrisquetToHVAC(self, mode: int, derog: bool,preset_mode,CAMB,TAMB):
         _LOGGER.debug("modeFrisquetToHVAC : derog %s & preset %s", derog,preset_mode)
         if derog == True :
-            return HVACMode.HEAT
+            if CAMB > TAMB:
+                return HVACMode.HEAT
+            else: return HVACMode.OFF
         elif derog == False and preset_mode != "Hors Gel" and preset_mode != "Confort Permanent" and preset_mode != "Réduit Permanent" :
             return HVACMode.AUTO
 
