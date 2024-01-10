@@ -16,7 +16,7 @@ from homeassistant.helpers.entity_platform import (
     AddEntitiesCallback,
     async_get_current_platform,
 )
-
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.components.climate import(
     ClimateEntity
 )
@@ -118,6 +118,19 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self.data[idx] :dict ={}
         self.data[idx].update(coordinator.data[idx])
 
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                (DOMAIN, self.unique_id)
+            },
+            name=self.name,
+            manufacturer="Frisquet",
+            model= self.coordinator.data[self.idx]["produit"],
+            serial_number=self.coordinator.data[self.idx]["identifiant_chaudiere"],
+        )
 
     @property
     def icon(self) -> str | None:
