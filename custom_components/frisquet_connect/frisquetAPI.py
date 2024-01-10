@@ -15,17 +15,7 @@ class FrisquetGetInfo:
 
     async def async_request_refresh(self):
       _LOGGER.debug("async_request_refresh Frisquet API: %s",self.data)
-      #data= self.data[FrisquetConnectEntity.idx]
-      #self.data[FrisquetConnectEntity.idx] = await self.getTokenAndInfo(data,FrisquetConnectEntity.idx)
-      #if float(self.data[FrisquetConnectEntity.idx]["date_derniere_remontee"]) > float(FrisquetConnectEntity.TimeLastOrder):
-      #  _LOGGER.debug("async_request_refresh Frisquet API Update in progress")
-      #  FrisquetConnectEntity._attr_current_temperature= self.data[FrisquetConnectEntity.idx]["TAMB"] / 10
-      #  FrisquetConnectEntity._attr_preset_mode= FrisquetConnectEntity.defPreset(self,self.data[FrisquetConnectEntity.idx]["SELECTEUR"], self.data[FrisquetConnectEntity.idx]["MODE"],self.data[FrisquetConnectEntity.idx]["ACTIVITE_BOOST"],self.data[FrisquetConnectEntity.idx]["DERO"] )
-      #  FrisquetConnectEntity._attr_hvac_mode =  FrisquetConnectEntity.modeFrisquetToHVAC(self,self.data[FrisquetConnectEntity.idx]["MODE"],self.data[FrisquetConnectEntity.idx]["DERO"],FrisquetConnectEntity._attr_preset_mode,self.data[FrisquetConnectEntity.idx]["CAMB"] / 10,self.data[FrisquetConnectEntity.idx]["TAMB"] /10)
-      #  FrisquetConnectEntity._attr_target_temperature= FrisquetConnectEntity.defConsigneTemp(self,FrisquetConnectEntity._attr_preset_mode,self.data[FrisquetConnectEntity.idx]["CONS_CONF"] / 10,self.data[FrisquetConnectEntity.idx]["CONS_RED"] / 10,self.data[FrisquetConnectEntity.idx]["CONS_HG"] / 10)
-      #else:
-      #   _LOGGER.debug("async_request_refresh Frisquet API No Update")
-      #   pass
+
 
     async def async_add_listener(self,pos2,pos3):
       _LOGGER.debug("async_add_listener Frisquet API: %s  pos2: %s  pos3:  %s",self.data, pos2, pos3)
@@ -70,8 +60,6 @@ class FrisquetGetInfo:
                             self.data["zone"+str(i+1)]["numero"] = response["zones"][i]["numero"]
                             self.data["zone"+str(i+1)]["nom"] = response["zones"][i]["nom"]
 
-                            #data["carac_zone"+str(i+1)]: dict= {}
-                            #data["carac_zone"+str(i+1)]=response["zones"][i]["carac_zone"]
                             self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
                             self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
                             self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
@@ -79,8 +67,6 @@ class FrisquetGetInfo:
                             self.data["zone"+str(i+1)]["token"]=json_data["token"]
                             self.data["zone"+str(i+1)]["email"]= email
                             self.data["zone"+str(i+1)]["password"]= password
-                            #self.data["zone"+str(i+1)]
-
 
 
                         self.data["ecs"] = response["ecs"]
