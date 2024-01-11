@@ -39,3 +39,8 @@ home-assistant.log.fault
 .storage/repairs.issue_registry
 .storage/trace.saved_traces
 custom_components/frisquet_connect/__pycache__/sensor.cpython-311.pyc
+.storage/tmp_06_jycb
+.storage/tmpcgzgmh2y
+.storage/tmpp47262fq
+.gitignore
+.gitignore
