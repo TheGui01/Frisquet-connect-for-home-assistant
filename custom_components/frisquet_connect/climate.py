@@ -155,30 +155,30 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         _LOGGER.debug("In async_set_hvac_mode request: '%s",hvac_mode)
         _LOGGER.debug("In async_set_hvac_mode  current mode: '%s",self.hvac_mode)
         if hvac_mode == "auto" and (self._attr_preset_mode== "Hors Gel" or self._attr_preset_mode == "Réduit Permanent" or self._attr_preset_mode == "Confort Permanent"):
-            _key = "SELECTEUR_Z"+ str(FrisquetConnectEntity.zoneNR)
+            _key = "SELECTEUR_Z"+ str(self.coordinator.data[self.idx]["numero"])
             mode = 5
             await OrderToFrisquestAPI(self,_key,mode)
             #self.hvac_mode = "auto"
-            self.target_temperature = self.defConsigneTemp(self._attr_preset_mode,self.coordinator.data[self.idx]["CONS_CONF"] / 10,self.coordinator.data[self.idx]["CONS_RED"] / 10,self.coordinator.data[self.idx]["CONS_HG"] / 10)
-        elif hvac_mode == "auto" and (int(FrisquetConnectEntity.Selecteur) != 5 or FrisquetConnectEntity.Derogation == True ):
+            self._attr_target_temperature = self.defConsigneTemp(self._attr_preset_mode,self.coordinator.data[self.idx]["CONS_CONF"] / 10,self.coordinator.data[self.idx]["CONS_RED"] / 10,self.coordinator.data[self.idx]["CONS_HG"] / 10)
+        elif hvac_mode == "auto" and (int(self.coordinator.data[self.idx]["SELECTEUR"]) != 5 or self.coordinator.data[self.idx]["DERO"] == True ):
 
-            _key = "MODE_DERO"     #SELECTEUR_Z"+FrisquetConnectEntity.zoneNR
+            _key = "MODE_DERO"
             mode= 0     #5 #Auto
             await OrderToFrisquestAPI(self,_key,mode)
             #self.hvac_mode = "auto"
-            self.target_temperature = self.defConsigneTemp(self._attr_preset_mode,self.coordinator.data[self.idx]["CONS_CONF"] / 10,self.coordinator.data[self.idx]["CONS_RED"] / 10,self.coordinator.data[self.idx]["CONS_HG"] / 10)#self.coordinator.data["CAMB"] /10
+            self._attr_target_temperature = self.defConsigneTemp(self._attr_preset_mode,self.coordinator.data[self.idx]["CONS_CONF"] / 10,self.coordinator.data[self.idx]["CONS_RED"] / 10,self.coordinator.data[self.idx]["CONS_HG"] / 10)#self.coordinator.data["CAMB"] /10
 
         else: pass
 
     async def async_set_temperature(self, **kwargs):
         _LOGGER.debug("In Async Set TEmp: '%s",kwargs["temperature"])
         if self._attr_preset_mode == PRESET_COMFORT or self._attr_preset_mode == "Confort Permanent":
-            _key = "CONS_CONF_Z"+str(FrisquetConnectEntity.zoneNR)
+            _key = "CONS_CONF_Z"+str(self.coordinator.data[self.idx]["numero"])
             _LOGGER.debug("Key confort : %s", _key)
         elif self._attr_preset_mode == "Réduit" or self._attr_preset_mode == "Réduit Permanent":
-            _key = "CONS_RED_Z"+str(FrisquetConnectEntity.zoneNR)
+            _key = "CONS_RED_Z"+str(self.coordinator.data[self.idx]["numero"])
         elif self._attr_preset_mode == "Hors Gel":
-            _key = "CONS_HG_Z"+str(FrisquetConnectEntity.zoneNR)
+            _key = "CONS_HG_Z"+str(self.coordinator.data[self.idx]["numero"])
         else: pass
 
         _temp: int = kwargs["temperature"]*10
@@ -189,35 +189,35 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
     async def async_set_preset_mode(self, preset_mode):
             _LOGGER.debug("async_set_preset_mode requested: %s",preset_mode)
             _LOGGER.debug("async_set_preset_mode current %s",self._attr_preset_mode)
-            if FrisquetConnectEntity.Selecteur != 5: #on repasse en auto
+            if self.coordinator.data[self.idx]["SELECTEUR"] != 5: #on repasse en auto
                 mode = int(5)
-                _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
+                _key = "SELECTEUR_Z"+str(self.coordinator.data[self.idx]["numero"])
                 await OrderToFrisquestAPI(self,_key,mode)
                 #self._attr_hvac_mode = "auto"
 
             if preset_mode == 'Réduit Permanent':
                 mode = int(7)
-                _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
-                self.target_temperature= self.coordinator.data[self.idx]["CONS_RED"]/10
+                _key = "SELECTEUR_Z"+str(self.coordinator.data[self.idx]["numero"])
+                self._attr_target_temperature= self.coordinator.data[self.idx]["CONS_RED"]/10
 
             elif preset_mode == 'Comfort Permanent':
                 mode = int(6)
-                _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
-                self.target_temperature= self.coordinator.data[self.idx]["CONS_CONF"]/10
+                _key = "SELECTEUR_Z"+str(self.coordinator.data[self.idx]["numero"])
+                self._attr_target_temperature= self.coordinator.data[self.idx]["CONS_CONF"]/10
 
             elif preset_mode == 'Réduit':
                 mode = int(7)
                 _key = "MODE_DERO"
-                self.target_temperature= self.coordinator.data[self.idx]["CONS_RED"]/10
+                self._attr_target_temperature= self.coordinator.data[self.idx]["CONS_RED"]/10
 
             elif preset_mode == 'comfort':
                 mode = int(6)
                 _key = "MODE_DERO"
-                self.target_temperature= self.coordinator.data[self.idx]["CONS_CONF"]/10
+                self._attr_target_temperature= self.coordinator.data[self.idx]["CONS_CONF"]/10
             elif preset_mode == 'Hors Gel':
                 mode = int(8)
-                _key = "SELECTEUR_Z"+str(FrisquetConnectEntity.zoneNR)
-                self.target_temperature= self.coordinator.data[self.idx]["CONS_HG"]/10
+                _key = "SELECTEUR_Z"+str(self.coordinator.data[self.idx]["numero"])
+                self._attr_target_temperature= self.coordinator.data[self.idx]["CONS_HG"]/10
 
 
             await OrderToFrisquestAPI(self,_key,mode)
@@ -280,7 +280,7 @@ async def OrderToFrisquestAPI(self,key,valeur):
     _session = aiohttp.ClientSession(headers="")
     _IDChaudiere = FrisquetConnectEntity.IDchaudiere
     _LOGGER.debug("In OrderToFrisquestAPI IDChaudiere :'%s",_IDChaudiere)
-    _url =ORDER_API+_IDChaudiere+"?token="+FrisquetConnectEntity.token
+    _url =ORDER_API+_IDChaudiere+"?token="+self.coordinator.data[self.idx]["token"]
     _LOGGER.debug("In OrderToFrisquestAPI with url :'%s",_url)
     headers = {
                     'Host':'fcutappli.frisquet.com',
