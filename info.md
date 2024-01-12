@@ -1,6 +1,6 @@
 # Frisquet-connect-for-home-assistant
 This repository contains the Frisquet API that can be integrated in Home Assistant.
-
+![Screenshot](FrisquetDeviceSample.png)
 ## Features
 
 - Create climate entity Zone 1 and Zone 2 (if available)
