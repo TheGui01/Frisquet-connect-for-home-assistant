@@ -1,41 +1,13 @@
 [![HACS Custom][hacs_shield]][hacs]
-[![GitHub Latest Release][releases_shield]][latest_release]
+[![GitHub release](https://img.shields.io/github/release/TheGui01/Frisquet-connect-for-home-assistant?include_prereleases=&sort=semver&color=blue)](https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/)
 [![GitHub All Releases][downloads_total_shield]][releases]
 
 
 
 [hacs_shield]: https://img.shields.io/static/v1.svg?label=HACS&message=Custom&style=popout&color=orange&labelColor=41bdf5&logo=HomeAssistantCommunityStore&logoColor=white
 [hacs]: https://hacs.xyz/docs/faq/custom_repositories
+[releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=relea
 
-_Repo metadata_
-
-
-[![GitHub release](https://img.shields.io/github/release/TheGui01/Frisquet-connect-for-home-assistant?include_prereleases=&sort=semver&color=blue)](https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/)
-
-
-
-_Call-to-Action buttons_
-
-<div align="center">
-
-
-
-
-
-</div>
-
-## Documentation
-
-<div align="center">
-
-[![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
-
-</div>
-[releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=release
-
-
-
-[releases]: https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/latest
 [downloads_total_shield]: https://img.shields.io/github/downloads/TheGui01/Frisquet-connect-for-home-assistant/total
 
 # Frisquet Connect For Homme Assistant
