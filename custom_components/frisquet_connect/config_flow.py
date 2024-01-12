@@ -39,20 +39,7 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         data.update(user_input)
         _LOGGER.debug("_user_input=%s", data)
         data = await FrisquetGetInfo.getTokenAndInfo(self,data,0)
-        #for i in range(len(data["zones"])):
-            #if i!=0:
-        if data["zone1"]["numero"]!= "":
-            self.datadict :dict = data["zone1"]
-            await self.async_set_unique_id(str(self.datadict["identifiant_chaudiere"]) + str(self.datadict["numero"]))#+self.datadict["email"].lower())
-            return self.async_create_entry(title=self.datadict["nomInstall"],data=self.datadict)
-        if data["zone2"]["numero"]!= "":
-            self.datadict :dict = data["zone2"]
-            await self.async_set_unique_id(str(self.datadict["identifiant_chaudiere"]) + str(self.datadict["numero"]))
-            return self.async_create_entry(title=self.datadict["nomInstall"],unique_id=str(self.datadict["identifiant_chaudiere"]) + str(self.datadict["numero"]),data=self.datadict)
-
-
-
-
-
-
+        self.datadict :dict = data["zone1"]
+        await self.async_set_unique_id(str(self.datadict["identifiant_chaudiere"]))
+        return self.async_create_entry(title=self.datadict["nomInstall"],data=data)
 

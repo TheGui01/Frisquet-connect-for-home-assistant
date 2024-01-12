@@ -16,19 +16,21 @@ async def async_setup_entry (hass: HomeAssistant, entry: ConfigEntry) -> bool:  
     """Creation des entités à partir d'une configEntry"""
     _LOGGER.debug("In async_setup_entry __init__.py ")
     my_api = FrisquetGetInfo( entry.data)
-    idx = entry.data["nom"].replace(" ","").lower()
-    await my_api.getTokenAndInfo(entry.data,idx)
+    idx = entry.data["zone1"]["nom"].replace(" ","").lower()
+    await my_api.getTokenAndInfo(entry.data["zone1"],idx)
     _LOGGER.debug(
         "Appel de async_setup_entry entry: entry_id='%s', data='%s",
         entry.entry_id,
         entry.data,
-        #hass.data[DOMAIN][entry.entry_id]
     )
-    #hass.async_create_task( hass.config_entries.async_forward_entry_setup( entry, "Climate"))
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.unique_id]  = my_api
 
+    entry.async_on_unload(entry.add_update_listener(update_listener))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Fonction qui force le rechargement des entités associées à une configEntry"""
+    await hass.config_entries.async_reload(entry.entry_id)

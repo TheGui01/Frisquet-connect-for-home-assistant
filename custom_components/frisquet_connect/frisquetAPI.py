@@ -1,15 +1,13 @@
 import logging
 import aiohttp
-
 from .const import AUTH_API,API_URL
-#from .climate import FrisquetConnectEntity
-
-
 from homeassistant.config_entries import ConfigEntry
+
 _LOGGER = logging.getLogger(__name__)
+
 class FrisquetGetInfo:
 
-    def __init__(self,  entry: ConfigEntry):#, async_add_entities: AddEntitiesCallback):
+    def __init__(self,  entry: ConfigEntry):
       _LOGGER.debug("__init__ Frisquet API: %s", self)
       self.data: dict = {}
 
@@ -22,6 +20,7 @@ class FrisquetGetInfo:
 
     async def last_update_success(self,pos2,pos3):
       _LOGGER.debug("last_update_success Frisquet API: %s  pos2: %s  pos3:  %s",self.data, pos2, pos3)
+
     async def getTokenAndInfo(self,data,idx):
         self.data: dict = {}
         headers = {
@@ -49,6 +48,8 @@ class FrisquetGetInfo:
                     _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
                     async with await _session.get(url=_url) as resp:
                         response = await resp.json()
+                        #to Test zone2
+                        #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
                         _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
 
                         for i in range(len(response["zones"])):
@@ -67,7 +68,9 @@ class FrisquetGetInfo:
                             self.data["zone"+str(i+1)]["token"]=json_data["token"]
                             self.data["zone"+str(i+1)]["email"]= email
                             self.data["zone"+str(i+1)]["password"]= password
-
+                            self.data["zone"+str(i+1)]["T_EXT"] = response["environnement"]["T_EXT"]
+                            #To test T_EXT
+                            #self.data["zone"+str(i+1)]["T_EXT"] = 50
 
                         self.data["ecs"] = response["ecs"]
 
