@@ -10,7 +10,7 @@
 
 # Frisquet Connect For Homme Assistant
 
-
+![Screenshot](FrisquetDeviceSample.png)
 
 ## Installation
 
