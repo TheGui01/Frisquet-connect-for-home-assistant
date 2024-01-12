@@ -1,7 +1,6 @@
 [![HACS Custom][hacs_shield]][hacs]
 [![GitHub release](https://img.shields.io/github/release/TheGui01/Frisquet-connect-for-home-assistant?include_prereleases=&sort=semver&color=blue)](https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/)
-[![GitHub All Releases][downloads_total_shield]][releases]
-
+[![GitHub All Releases][downloads_total_shield]
 
 
 [hacs_shield]: https://img.shields.io/static/v1.svg?label=HACS&message=Custom&style=popout&color=orange&labelColor=41bdf5&logo=HomeAssistantCommunityStore&logoColor=white
