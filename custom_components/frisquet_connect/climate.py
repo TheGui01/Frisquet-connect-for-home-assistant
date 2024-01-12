@@ -68,7 +68,10 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
     async def async_update(self):
 
         _LOGGER.debug("In Climate.py async update %s",self)
-        self.data[self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.data[self.idx],self.idx)
+        try:
+            self.data[self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.data[self.idx],self.idx)
+        except:
+            self.data[self.idx]["date_derniere_remontee"] = 0
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
             _LOGGER.debug("In Climate.py async update in progress")
             self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10

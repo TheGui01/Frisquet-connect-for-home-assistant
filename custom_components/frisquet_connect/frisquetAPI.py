@@ -41,7 +41,7 @@ class FrisquetGetInfo:
         async with await _session.post(url=AUTH_API,headers=headers,json= Initjson_data) as resp:
                     #_LOGGER.debug("In getToken and info json data 1 '%s'" ,self.Initjson_data)
                     json_data = await resp.json()
-                    #_LOGGER.debug("In getToken and info json data 2 '%s'" ,self.json_data)
+                    _LOGGER.debug("In getToken and info json data 2 '%s'" ,json_data)
                     _url = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"?token="+json_data["token"]
                     await _session.close()
 
