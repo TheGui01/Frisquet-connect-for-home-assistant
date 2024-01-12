@@ -7,7 +7,30 @@
 [hacs_shield]: https://img.shields.io/static/v1.svg?label=HACS&message=Custom&style=popout&color=orange&labelColor=41bdf5&logo=HomeAssistantCommunityStore&logoColor=white
 [hacs]: https://hacs.xyz/docs/faq/custom_repositories
 
-[latest_release]: https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/latest
+_Repo metadata_
+
+
+[![GitHub release](https://img.shields.io/github/release/TheGui01/Frisquet-connect-for-home-assistant?include_prereleases=&sort=semver&color=blue)](https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/)
+
+
+
+_Call-to-Action buttons_
+
+<div align="center">
+
+
+
+
+
+</div>
+
+## Documentation
+
+<div align="center">
+
+[![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
+
+</div>
 [releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=release
 
 
