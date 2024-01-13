@@ -4,7 +4,7 @@ This repository contains the Frisquet API that can be integrated in Home Assista
 
 ## Features : Frisquet vs HA logic
 
-- Support Zone 1 & Zone 2, provide temperature sensors associated and external temperature sensor if available.
+- Supports Zone 1 & Zone 2, Boiler and provides temperature sensors associated and external temperature the sensor if available.
 - HVAC Modes :
     - Auto means there are no derogation. It's following Cycles Réduit & Confort that are programmed. As soon as you have a derogation / Boost / permanent state, you are either on HVAC mode Chauffe or OFF.<br>
     - Chauffe is activated if current temperature is lower than the temprature of the derogation you have set. You should see the state chauffe is not everytime immediate as we don't take in account the temperature of the mode, but another temperature adjusted in function of mode set directly on the boiler.<br>
