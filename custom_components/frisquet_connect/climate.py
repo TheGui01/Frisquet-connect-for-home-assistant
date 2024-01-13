@@ -178,8 +178,12 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             mode= 0     #5 #Auto
             await OrderToFrisquestAPI(self,_key,mode)
             #self.hvac_mode = "auto"
-            self._attr_target_temperature = self.defConsigneTemp(self._attr_preset_mode,self.coordinator.data[self.idx]["CONS_CONF"] / 10,self.coordinator.data[self.idx]["CONS_RED"] / 10,self.coordinator.data[self.idx]["CONS_HG"] / 10)#self.coordinator.data["CAMB"] /10
-
+            if self._attr_preset_mode == "Réduit":
+                GuessedPreset = "comfort"
+            else: GuessedPreset = "Réduit"
+            self._attr_preset_mode = GuessedPreset
+            self._attr_target_temperature = self.defConsigneTemp(GuessedPreset,self.coordinator.data[self.idx]["CONS_CONF"] / 10,self.coordinator.data[self.idx]["CONS_RED"] / 10,self.coordinator.data[self.idx]["CONS_HG"] / 10)#self.coordinator.data["CAMB"] /10
+            self.hvac_mode = "auto"
         else: pass
 
     async def async_set_temperature(self, **kwargs):
@@ -231,6 +235,8 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 _key = "SELECTEUR_Z"+str(self.coordinator.data[self.idx]["numero"])
                 self._attr_target_temperature= self.coordinator.data[self.idx]["CONS_HG"]/10
 
+            if _key == "MODE_DERO":
+                self.hvac_mode = self.modeFrisquetToHVAC(0,True,preset_mode,self.coordinator.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
 
             await OrderToFrisquestAPI(self,_key,mode)
 
