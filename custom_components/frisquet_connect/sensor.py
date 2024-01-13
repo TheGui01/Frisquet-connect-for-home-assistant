@@ -14,6 +14,9 @@ from .const import DOMAIN
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,)
 from homeassistant.helpers.entity import DeviceInfo
+from datetime import timedelta
+SCAN_INTERVAL = timedelta(seconds=150)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -91,18 +94,15 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
 
     @property
     def should_poll(self) -> bool:
-        _LOGGER.debug("should_poll sensor")
         """Poll for those entities"""
         return True
 
     @property
     def device_class(self) -> SensorDeviceClass | None:
-        _LOGGER.debug("device class sensor")
         return SensorDeviceClass.TEMPERATURE
 
     @property
     def state_class(self) -> SensorStateClass | None:
-        _LOGGER.debug("state_class sensor")
         return SensorStateClass.MEASUREMENT
 
 class FrisquetThermometer(SensorEntity,CoordinatorEntity):
@@ -119,7 +119,6 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
 
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
-        #idx = config_entry.data["zone1"]["nom"].replace(" ","").lower()
         self.idx =idx
         self._attr_unique_id = "T"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(coordinator.data[idx]["numero"])
         self._attr_name = "Temperature " +coordinator.data[idx]["nom"]
@@ -127,11 +126,8 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
         self._attr_has_entity_name = True
         self._attr_native_unit_of_measurement = "°C"
         self._attr_unit_of_measurement = "°C"
-
-        #self._attr_state = coordinator.data[idx]["TAMB"]/10
         self.data[idx] :dict ={}
         self.data[idx].update(coordinator.data[idx])
-        _LOGGER.debug("Thermometer init state : %s", self._attr_native_value)
 
 
     @property
@@ -154,16 +150,13 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
 
     @property
     def should_poll(self) -> bool:
-        _LOGGER.debug("should_poll sensor")
         """Poll for those entities"""
         return True
 
     @property
     def device_class(self) -> SensorDeviceClass | None:
-        _LOGGER.debug("device class sensor")
         return SensorDeviceClass.TEMPERATURE
 
     @property
     def state_class(self) -> SensorStateClass | None:
-        _LOGGER.debug("state_class sensor")
         return SensorStateClass.MEASUREMENT

@@ -3,7 +3,7 @@
 from homeassistant.const import Platform
 from enum import IntFlag, StrEnum
 DOMAIN = "frisquet_connect"
-PLATFORMS: list[Platform] = [Platform.CLIMATE,Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.CLIMATE,Platform.SENSOR,Platform.WATER_HEATER]
 AUTH_API        = "https://fcutappli.frisquet.com/api/v1/authentifications"
 API_URL         = "https://fcutappli.frisquet.com/api/v1/sites/"
 ORDER_API      = "https://fcutappli.frisquet.com/api/v1/ordres/"
@@ -23,6 +23,7 @@ class ClimateEntityFeature(IntFlag):
     """Supported features of the climate entity."""
     PRESET_MODE = 6
     TARGET_TEMPERATURE = 1
+
 class PRESET_MODE(StrEnum):
     PRESET_REDUIT= "Réduit"
     PRESET_REDUITP= "Réduit Permanent"
@@ -30,3 +31,12 @@ class PRESET_MODE(StrEnum):
     PRESET_HG = "Hors Gel"
     #BOOST = "Boost"
     #CONFORT= "Confort"
+
+class WaterHeaterModes(StrEnum):
+    MAX= "Max"
+    ECO = "Eco"
+    ECOT = "Eco Timer"
+    ECOP = "Eco+"
+    ECOPT  = "Eco+ Timer"
+    OFF = "Stop"
+

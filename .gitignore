@@ -39,3 +39,5 @@ home-assistant.log.fault
 .storage/repairs.issue_registry
 .storage/trace.saved_traces
 custom_components/frisquet_connect/__pycache__/sensor.cpython-311.pyc
+custom_components/frisquet_connect/__pycache__/water_heater.cpython-311.pyc
+.gitignore
