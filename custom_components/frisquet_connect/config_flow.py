@@ -1,6 +1,6 @@
 """ Le Config Flow """
 import logging
-from homeassistant.config_entries import ConfigFlow
+from homeassistant.config_entries import ConfigFlow,ConfigEntries
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
 import aiohttp
@@ -13,7 +13,6 @@ _LOGGER = logging.getLogger(__name__)
 class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION=1
-
 
 
     async def async_step_user(self, user_input : dict | None = None,   ) -> FlowResult:
@@ -42,4 +41,5 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         self.datadict :dict = data["zone1"]
         await self.async_set_unique_id(str(self.datadict["identifiant_chaudiere"]))
         return self.async_create_entry(title=self.datadict["nomInstall"],data=data)
+
 

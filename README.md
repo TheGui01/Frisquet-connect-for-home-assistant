@@ -11,8 +11,15 @@
 # Frisquet Connect For Homme Assistant
 
 ![Screenshot](FrisquetDeviceSample.png)
+![Screenshot](FrisquetDeviceSample2.png)
 
 ## Installation
+
+### HACS
+
+Add this repo (https://github.com/TheGui01/Frisquet-connect-for-home-assistant) to the HACS store and install from there.
+
+### local install
 
 1- Copy the folder frisquet_connect into your custom_components folder<br>
 2- Restart HA and add the integration Frisquet connect from Device -> Add integration<br>
@@ -24,9 +31,9 @@ Several Zones will be supported in a future version
 
 ## Features : Frisquet vs HA logic
 
-- Supports Zone 1 & Zone 2, Boiler and provides temperature sensors associated and external temperature the sensor if available.
+- Supports Zone 1 & Zone 2, Water heater, provides temperature sensors associated and external temperature the sensor if available.
 - HVAC Modes :
-    - Auto means there are no derogation. It's following Cycles Réduit & Confort that are programmed. As soon as you have a derogation / Boost / permanent state, you are either on HVAC mode Chauffe or OFF.<br>
+    - Auto means there are no derogation. It's following Cycles Réduit & Confort that are programmed. As soon as you have a derogation or a permanent state, you are either on HVAC mode Chauffe or OFF.<br>
     - Chauffe is activated if current temperature is lower than the temprature of the derogation you have set. You should see the state chauffe is not everytime immediate as we don't take in account the temperature of the mode, but another temperature adjusted in function of mode set directly on the boiler.<br>
     - Off is set if you are in a derogated mode and current temperature is higer than the temprature of the derogation you have set<br>
 
@@ -38,6 +45,6 @@ Switch to OFF or Chauffe has no effect.<br>
 
     - Réduit Permanent, Confort Permanent, Hors Gel : If chosen, HVAC Mode = Chauffe. Switch back HVAC mode to Auto to stop the "Permanent" mode
 
-    - Boost Mode : Should behave like Permanent mode : to be tested...
+    - Boost Mode is deactivated so far, until I get API command to change its state.
 
 

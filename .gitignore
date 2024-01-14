@@ -41,3 +41,5 @@ home-assistant.log.fault
 custom_components/frisquet_connect/__pycache__/sensor.cpython-311.pyc
 custom_components/frisquet_connect/__pycache__/water_heater.cpython-311.pyc
 .gitignore
+.storage/lovelace
+.gitignore

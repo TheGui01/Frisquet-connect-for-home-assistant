@@ -60,6 +60,7 @@ class FrisquetGetInfo:
                             self.data["zone"+str(i+1)]["identifiant"] = response["zones"][i]["identifiant"]
                             self.data["zone"+str(i+1)]["numero"] = response["zones"][i]["numero"]
                             self.data["zone"+str(i+1)]["nom"] = response["zones"][i]["nom"]
+                            self.data["zone"+str(i+1)]["programmation"] = response["zones"][i]["programmation"]
 
                             self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
                             self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]

@@ -33,24 +33,23 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
 
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
-        try:
-            self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.Id_ECS)
-            _LOGGER.debug("In watter heater.py async update water heater %s" ,FrisquetConnectEntity.TAMB)
-        except:
-            _LOGGER.debug("In watter heater.py async update failed %s" ,FrisquetConnectEntity.TAMB)
-            pass
+        #try:
+        self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS)
+        _LOGGER.debug("In watter heater.py async update water heater")
+        #except:
+        #    _LOGGER.debug("In watter heater.py async update failed")
+         #   pass
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
 
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
-        self.idx = idx
-        self.idx =idx
+
         self._attr_name = "Chauffe eau"
         self._attr_unique_id = "WH"+str(coordinator.data["zone1"]["identifiant_chaudiere"]) + str(9)
         self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
-        self.current_operation =  self.FrisquetToOperation(coordinator.data[idx]["MODE_ECS"]["id"])
+        self.current_operation =  self.FrisquetToOperation(coordinator.data["ecs"]["MODE_ECS"]["id"])
         self.temperature_unit = "°C"
         self._attr_supported_features   =  WaterHeaterEntityFeature.OPERATION_MODE
 
@@ -88,6 +87,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
             mode = int(5)
 
         self.current_operation = operation_mode
+        FrisquetConnectEntity.id_ECS = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
 
 
