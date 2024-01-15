@@ -80,7 +80,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         except:
             self.data[self.idx]["date_derniere_remontee"] = 0
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
-            _LOGGER.debug("In Climate.py async update in progress")
+            _LOGGER.debug("In Climate.py async update in progress %s",self.data[self.idx]["token"])
             self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10
             FrisquetConnectEntity.TAMB= self.data[self.idx]["TAMB"] / 10
             self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
@@ -331,7 +331,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         _session = aiohttp.ClientSession(headers="")
         _IDChaudiere = FrisquetConnectEntity.IDchaudiere
         _LOGGER.debug("In OrderToFrisquestAPI IDChaudiere :'%s",_IDChaudiere)
-        _url =ORDER_API+_IDChaudiere+"?token="+FrisquetConnectEntity.data[idx]["token"]
+        _url =ORDER_API+_IDChaudiere+"?token="+self.data[idx]["token"]
         _LOGGER.debug("In OrderToFrisquestAPI with url :'%s",_url)
         headers = {
                         'Host':'fcutappli.frisquet.com',
