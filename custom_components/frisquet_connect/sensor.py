@@ -111,9 +111,9 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
 
-        self._attr_native_value = FrisquetConnectEntity.TAMB
-        self._attr_state = FrisquetConnectEntity.TAMB
-        _LOGGER.debug("In sensor.py async update Climeentitytemp %s" ,FrisquetConnectEntity.TAMB)
+        self._attr_native_value = FrisquetConnectEntity.TAMB[self.idx]
+        self._attr_state = FrisquetConnectEntity.TAMB[self.idx]
+        _LOGGER.debug("In sensor.py async update Climeentitytemp %s" ,FrisquetConnectEntity.TAMB[self.idx])
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
 

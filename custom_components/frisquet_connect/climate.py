@@ -82,7 +82,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
             _LOGGER.debug("In Climate.py async update in progress %s",self.data[self.idx]["token"])
             self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10
-            FrisquetConnectEntity.TAMB= self.data[self.idx]["TAMB"] / 10
+            FrisquetConnectEntity.TAMB[self.idx]= self.data[self.idx]["TAMB"] / 10
             self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
             self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
@@ -127,7 +127,8 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.Derogation=self.data[idx]["DERO"]
         FrisquetConnectEntity.TimeLastOrder = time.time()
         self._attr_current_temperature= self.data[idx]["TAMB"] / 10
-        FrisquetConnectEntity.TAMB= self.data[idx]["TAMB"] / 10
+        FrisquetConnectEntity.TAMB : dict ={}
+        FrisquetConnectEntity.TAMB[idx]= self.data[idx]["TAMB"] / 10
         self._attr_preset_mode= self.defPreset(FrisquetConnectEntity.Selecteur, FrisquetConnectEntity.Mode,self.data[idx]["ACTIVITE_BOOST"],FrisquetConnectEntity.Derogation )
         _LOGGER.debug("Init climate  preset: %s",self._attr_preset_mode)
         self._attr_hvac_mode =  self.modeFrisquetToHVAC(FrisquetConnectEntity.Mode,FrisquetConnectEntity.Derogation,self._attr_preset_mode,self.data[idx]["CAMB"] / 10,self.data[idx]["TAMB"] /10)
