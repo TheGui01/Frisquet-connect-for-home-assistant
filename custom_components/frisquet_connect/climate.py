@@ -212,7 +212,12 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 mode = int(5)
                 _key = "SELECTEUR_Z"+str(self.data[self.idx]["numero"])
                 await self.OrderToFrisquestAPI(_key,mode)
-                #self._attr_hvac_mode = "auto"
+
+            if self.data[self.idx]["ACTIVITE_BOOST"] == True and preset_mode != 'Boost': #on desactive le boost
+                mode = int(0)
+                _key = "ACTIVITE_BOOST_Z"+str(self.data[self.idx]["numero"])
+                await self.OrderToFrisquestAPI(_key,mode)
+
 
             if preset_mode == 'Réduit Permanent':
                 mode = int(7)
@@ -239,9 +244,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 self._attr_target_temperature= self.data[self.idx]["CONS_HG"]/10
 
             elif preset_mode == 'Boost':
-                mode = int(8)
-                _key = "SELECTEUR_Z"+str(self.data[self.idx]["numero"])
-                self._attr_target_temperature= self.data[self.idx]["CONS_HG"]/10
+                mode = int(1)
+                _key = "ACTIVITE_BOOST_Z"+str(self.data[self.idx]["numero"])
+                self._attr_target_temperature= self.data[self.idx]["CONS_CONF"]/10
 
             if _key == "MODE_DERO":
                 self.hvac_mode = self.modeFrisquetToHVAC(0,True,preset_mode,self.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
@@ -252,7 +257,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
     def DefineavAilablePresetmodes(self,boost: bool):
         _LOGGER.debug("defineaavailPresetMode")
         if boost == True:
-            return [PRESET_COMFORT,PRESET_MODE.PRESET_REDUIT,PRESET_MODE.PRESET_HG,PRESET_MODE.PRESET_REDUITP,PRESET_MODE.PRESET_COMFORTP]#PRESET_BOOST,
+            return [PRESET_COMFORT,PRESET_MODE.PRESET_REDUIT,PRESET_BOOST,PRESET_MODE.PRESET_HG,PRESET_MODE.PRESET_REDUITP,PRESET_MODE.PRESET_COMFORTP]
         else:
             return [PRESET_COMFORT,PRESET_MODE.PRESET_REDUIT,PRESET_MODE.PRESET_HG,PRESET_MODE.PRESET_REDUITP,PRESET_MODE.PRESET_COMFORTP]
 
@@ -292,7 +297,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
     def modeFrisquetToHVAC(self, mode: int, derog: bool,preset_mode,CAMB,TAMB):
         _LOGGER.debug("modeFrisquetToHVAC : derog %s & preset %s", derog,preset_mode)
-        if derog == True :
+        if derog == True or preset_mode == 'Boost':
             if CAMB > TAMB:
                 return HVACMode.HEAT
             else: return HVACMode.OFF
