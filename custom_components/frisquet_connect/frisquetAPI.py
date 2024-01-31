@@ -46,36 +46,40 @@ class FrisquetGetInfo:
 
                     _session = aiohttp.ClientSession(headers="")
                     _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
-                    async with await _session.get(url=_url) as resp:
-                        response = await resp.json()
-                        #to Test zone2
-                        #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
-                        _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
+                    try:
+                      async with await _session.get(url=_url) as resp:
+                          response = await resp.json()
+                          #to Test zone2
+                          #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
+                          _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
 
-                        for i in range(len(response["zones"])):
-                          if response["zones"][i]["numero"]!= "":
-                            self.data["zone"+str(i+1)]:dict = {}
-                            self.data["zone"+str(i+1)] = response["zones"][i]["carac_zone"]
-                            self.data["zone"+str(i+1)]["boost_disponible"] = response["zones"][i]["boost_disponible"]
-                            self.data["zone"+str(i+1)]["identifiant"] = response["zones"][i]["identifiant"]
-                            self.data["zone"+str(i+1)]["numero"] = response["zones"][i]["numero"]
-                            self.data["zone"+str(i+1)]["nom"] = response["zones"][i]["nom"]
-                            self.data["zone"+str(i+1)]["programmation"] = response["zones"][i]["programmation"]
+                          for i in range(len(response["zones"])):
+                            if response["zones"][i]["numero"]!= "":
+                              self.data["zone"+str(i+1)]:dict = {}
+                              self.data["zone"+str(i+1)] = response["zones"][i]["carac_zone"]
+                              self.data["zone"+str(i+1)]["boost_disponible"] = response["zones"][i]["boost_disponible"]
+                              self.data["zone"+str(i+1)]["identifiant"] = response["zones"][i]["identifiant"]
+                              self.data["zone"+str(i+1)]["numero"] = response["zones"][i]["numero"]
+                              self.data["zone"+str(i+1)]["nom"] = response["zones"][i]["nom"]
+                              self.data["zone"+str(i+1)]["programmation"] = response["zones"][i]["programmation"]
 
-                            self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
-                            self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
-                            self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
-                            self.data["zone"+str(i+1)]["nomInstall"] = response["nom"]
-                            self.data["zone"+str(i+1)]["token"]=json_data["token"]
-                            self.data["zone"+str(i+1)]["email"]= email
-                            self.data["zone"+str(i+1)]["password"]= password
-                            self.data["zone"+str(i+1)]["T_EXT"] = response["environnement"]["T_EXT"]
-                            #To test T_EXT
-                            #self.data["zone"+str(i+1)]["T_EXT"] = 50
+                              self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
+                              self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
+                              self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
+                              self.data["zone"+str(i+1)]["nomInstall"] = response["nom"]
+                              self.data["zone"+str(i+1)]["token"]=json_data["token"]
+                              self.data["zone"+str(i+1)]["email"]= email
+                              self.data["zone"+str(i+1)]["password"]= password
+                              self.data["zone"+str(i+1)]["T_EXT"] = response["environnement"]["T_EXT"]
+                              #To test T_EXT
+                              #self.data["zone"+str(i+1)]["T_EXT"] = 50
 
-                        self.data["ecs"] = response["ecs"]
+                          self.data["ecs"] = response["ecs"]
 
-                        await _session.close()
-                        if idx == 0:
-                          return self.data
-                        else: return self.data[idx]
+                          await _session.close()
+                          if idx == 0:
+                            return self.data
+                          else: return self.data[idx]
+                    except:
+                      self.data[idx]["date_derniere_remontee"] = 0
+                      return self.data[idx]
