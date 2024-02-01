@@ -81,6 +81,7 @@ class FrisquetGetInfo:
                               return self.data
                             else: return self.data[idx]
                       else:
+                         self.data[idx]:dict = {}
                          self.data[idx]["date_derniere_remontee"] = 0
 
                     except:
