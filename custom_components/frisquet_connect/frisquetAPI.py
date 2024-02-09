@@ -10,7 +10,7 @@ class FrisquetGetInfo:
     def __init__(self,  entry: ConfigEntry):
       _LOGGER.debug("__init__ Frisquet API: %s", self)
       self.data: dict = {}
-
+      self.previousdata: dict = {}
     async def async_request_refresh(self):
       _LOGGER.debug("async_request_refresh Frisquet API: %s",self.data)
 
@@ -38,17 +38,20 @@ class FrisquetGetInfo:
         _session = aiohttp.ClientSession(headers="")
         _LOGGER.debug("In getToken and info Frisquet API")
         async with await _session.post(url=AUTH_API,headers=headers,json= Initjson_data) as resp:
-                    #_LOGGER.debug("In getToken and info json data 1 '%s'" ,self.Initjson_data)
-                    json_data = await resp.json()
+                    try:#_LOGGER.debug("In getToken and info json data 1 '%s'" ,self.Initjson_data)
+                      json_data = await resp.json()
                     #_LOGGER.debug("In getToken and info json data 2 '%s'" ,self.json_data)
-                    _url = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"?token="+json_data["token"]
-                    await _session.close()
+                      _url = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"?token="+json_data["token"]
+                      await _session.close()
 
-                    _session = aiohttp.ClientSession(headers="")
-                    _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
-                    try:
+                      _session = aiohttp.ClientSession(headers="")
+                      _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
+
                       async with await _session.get(url=_url) as resp:
+                          #if idx == 0:   ##if else to test no response from server
                           response = await resp.json()
+                          #else:
+                          #  response = ""
                           #to Test zone2
                           #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
                           _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
@@ -75,15 +78,19 @@ class FrisquetGetInfo:
                                 #self.data["zone"+str(i+1)]["T_EXT"] = 50
 
                             self.data["ecs"] = response["ecs"]
-
+                            self.previousdata= self.data
                             await _session.close()
                             if idx == 0:
                               return self.data
                             else: return self.data[idx]
                       else:
+                         await _session.close()
                          #self.data[idx]:dict = {}
-                         self.data[idx]["date_derniere_remontee"] = 0
+                         #self.data[idx].update({"date_derniere_remontee": 0})
+                         return self.previousdata
 
                     except:
-                      self.data[idx]["date_derniere_remontee"] = 0
+                      await _session.close()
+                      self.data[idx]:dict = {}
+                      self.data[idx].update({"date_derniere_remontee": 0})
                       return self.data[idx]

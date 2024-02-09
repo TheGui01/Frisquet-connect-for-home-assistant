@@ -76,7 +76,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
         _LOGGER.debug("In Climate.py async update %s",self)
         try:
-            self.data[self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.data[self.idx],self.idx)
+            self.data[self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[self.idx],self.idx)
         except:
             self.data[self.idx]["date_derniere_remontee"] = 0
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
@@ -94,7 +94,8 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
         else:
          _LOGGER.debug("In Climate.py async update No Update")
-         pass
+         #self.data = FrisquetGetInfo.previousdata
+        pass
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity ,idx) -> None:
 
