@@ -43,6 +43,6 @@ Switch to OFF or Chauffe has no effect.<br>
 
     - Réduit Permanent, Confort Permanent, Hors Gel : If chosen, HVAC Mode = Chauffe or Off. Switch back HVAC mode to Auto to stop the "Permanent" mode
 
-    - Boost Mode is deactivated so far, until I get API command to change its state.
+    - Boost Mode available
 
 
