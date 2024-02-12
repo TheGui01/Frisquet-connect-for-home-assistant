@@ -6,7 +6,7 @@
 [hacs_shield]: https://img.shields.io/static/v1.svg?label=HACS&message=Custom&style=popout&color=orange&labelColor=41bdf5&logo=HomeAssistantCommunityStore&logoColor=white
 [hacs]: https://hacs.xyz/docs/faq/custom_repositories
 [releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=relea
-[downloads_total_shield]: https://img.shields.io/github/downloads/thegui01/frisquet-connect-for-home-assistant/total
+[downloads-total-shield]:https://img.shields.io/github/downloads/thegui01/frisquet-connect-for-home-assistant/total
 
 # Frisquet Connect For Homme Assistant
 
