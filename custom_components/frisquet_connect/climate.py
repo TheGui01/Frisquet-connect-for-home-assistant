@@ -103,7 +103,6 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         _LOGGER.debug("Climate INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         self.idx = idx
-        self.data[idx] :dict ={}
         self.data[idx].update(coordinator.data[idx])
         FrisquetConnectEntity.tz= coordinator.data["timezone"]
         _LOGGER.debug("Init Entity='%s'", self.data[idx])
