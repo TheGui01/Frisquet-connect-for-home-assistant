@@ -12,5 +12,23 @@
                 }
             }
         }
+    },
+    "entity": {
+        "climate": {
+            "frisquet_connect": {
+                "state_attributes": {
+                    "preset_mode": {
+                        "state": {
+                            "comfort": "Confort",
+                            "Réduit": "Réduit",
+                            "boost": "Boost",
+                            "Hors Gel": "Hors Gel",
+                            "Réduit Permanent": "Réduit Permanent",
+                            "Confort Permanent": "Confort Permanent"
+                        }
+                    }
+                }
+            }
+        }
     }
 }

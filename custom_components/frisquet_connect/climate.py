@@ -117,6 +117,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self._attr_target_temperature_high = 25
         self._attr_hvac_modes  = [HVACMode.HEAT, HVACMode.AUTO, HVACMode.OFF]
         self._attr_preset_modes = self.DefineavAilablePresetmodes(self.data[idx]["boost_disponible"] )
+        self._attr_translation_key = "frisquet_connect"
 
         FrisquetConnectEntity.IDchaudiere = str(self.data[idx]["identifiant_chaudiere"])
         FrisquetConnectEntity.zoneNR: str = self.data[idx]["numero"]
@@ -161,6 +162,10 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
     def should_poll(self) -> bool:
         """Poll for those entities"""
         return True
+
+   # @property
+   # def translation_key(self):
+   #     return True
 
     @callback
     def _handle_coordinator_update(self) -> None:
