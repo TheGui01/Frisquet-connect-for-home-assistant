@@ -176,7 +176,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         """Set new target hvac mode."""
         _LOGGER.debug("In async_set_hvac_mode request: '%s",hvac_mode)
         _LOGGER.debug("In async_set_hvac_mode  current mode: '%s",self.hvac_mode)
-        if hvac_mode == "auto" and (self._attr_preset_mode== "Hors Gel" or self._attr_preset_mode == "Réduit Permanent" or self._attr_preset_mode == "Confort Permanent"):
+        if hvac_mode == "auto" and (self._attr_preset_mode== "Hors Gel" or self._attr_preset_mode == "Reduit Permanent" or self._attr_preset_mode == "Confort Permanent"):
             _key = "SELECTEUR_Z"+ str(self.data[self.idx]["numero"])
             mode = 5
             await self.OrderToFrisquestAPI(_key,mode)
@@ -189,9 +189,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             mode= 0     #5 #Auto
             await self.OrderToFrisquestAPI(_key,mode)
             #self.hvac_mode = "auto"
-            #if self._attr_preset_mode == "Réduit":
+            #if self._attr_preset_mode == "Reduit":
             #    GuessedPreset = "comfort"
-            #else: GuessedPreset = "Réduit"
+            #else: GuessedPreset = "Reduit"
             self._attr_preset_mode = self.getPresetFromProgramation()
             self._attr_target_temperature = self.defConsigneTemp(self.getPresetFromProgramation(),self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)#self.data["CAMB"] /10
             self.hvac_mode = "auto"
@@ -202,7 +202,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         if self._attr_preset_mode == PRESET_COMFORT or self._attr_preset_mode == "Confort Permanent":
             _key = "CONS_CONF_Z"+str(self.data[self.idx]["numero"])
             _LOGGER.debug("Key confort : %s", _key)
-        elif self._attr_preset_mode == "Réduit" or self._attr_preset_mode == "Réduit Permanent":
+        elif self._attr_preset_mode == "Reduit" or self._attr_preset_mode == "Reduit Permanent":
             _key = "CONS_RED_Z"+str(self.data[self.idx]["numero"])
         elif self._attr_preset_mode == "Hors Gel":
             _key = "CONS_HG_Z"+str(self.data[self.idx]["numero"])
@@ -226,7 +226,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 await self.OrderToFrisquestAPI(_key,mode)
 
 
-            if preset_mode == 'Réduit Permanent':
+            if preset_mode == 'Reduit Permanent':
                 mode = int(7)
                 _key = "SELECTEUR_Z"+str(self.data[self.idx]["numero"])
                 self._attr_target_temperature= self.data[self.idx]["CONS_RED"]/10
@@ -236,7 +236,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 _key = "SELECTEUR_Z"+str(self.data[self.idx]["numero"])
                 self._attr_target_temperature= self.data[self.idx]["CONS_CONF"]/10
 
-            elif preset_mode == 'Réduit':
+            elif preset_mode == 'Reduit':
                 mode = int(7)
                 _key = "MODE_DERO"
                 self._attr_target_temperature= self.data[self.idx]["CONS_RED"]/10
@@ -255,8 +255,10 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 _key = "ACTIVITE_BOOST_Z"+str(self.data[self.idx]["numero"])
                 self._attr_target_temperature= self.data[self.idx]["CONS_CONF"]/10
 
-            #if _key == "MODE_DERO":
-            self.hvac_mode = self.modeFrisquetToHVAC(0,self.data[self.idx]["DERO"],preset_mode,self.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
+            if _key == "MODE_DERO" or preset_mode == 'Confort Permanent' or preset_mode == 'Confort Permanent'or preset_mode == 'Hors Gel':
+                self.hvac_mode = self.modeFrisquetToHVAC(0,True,preset_mode,self.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
+            else:
+                self.hvac_mode = self.modeFrisquetToHVAC(0,self.data[self.idx]["DERO"],preset_mode,self.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
 
             self._attr_preset_mode = preset_mode
             await self.OrderToFrisquestAPI(_key,mode)
@@ -273,20 +275,20 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         #if BOOST == True:
         #    return  PRESET_BOOST
         if Dero == True :
-            if selecteur== 5 and mode== 7: return "Réduit"
+            if selecteur== 5 and mode== 7: return "Reduit"
             if selecteur== 5 and mode== 6: return PRESET_COMFORT
         elif selecteur == 5:
             return self.getPresetFromProgramation()
             if mode == 6: return PRESET_COMFORT
-            if mode == 7: return "Réduit"
+            if mode == 7: return "Reduit"
         elif selecteur == 6:
             if mode == 6:
                 return "Confort Permanent"
             else: return PRESET_COMFORT
         elif selecteur == 7:
             if mode == 7:
-                return "Réduit Permanent"
-            else: return "Réduit"
+                return "Reduit Permanent"
+            else: return "Reduit"
         elif  selecteur == 8:
             return "Hors Gel"
         else:
@@ -297,7 +299,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         if preset_mode == "comfort" or preset_mode == "Confort Permanent":
             _LOGGER.debug("In DefconsigneTemp comfort is true: %s", CONS_CONF)
             return    CONS_CONF
-        elif preset_mode == "Réduit" or preset_mode == "Réduit Permanent":
+        elif preset_mode == "Reduit" or preset_mode == "Reduit Permanent":
             return    CONS_RED
         elif preset_mode == "Hors Gel":
             return    CONS_HG
@@ -308,7 +310,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             if CAMB > TAMB:
                 return HVACMode.HEAT
             else: return HVACMode.OFF
-        elif derog == False and preset_mode != "Hors Gel" and preset_mode != "Confort Permanent" and preset_mode != "Réduit Permanent" :
+        elif derog == False and preset_mode != "Hors Gel" and preset_mode != "Confort Permanent" and preset_mode != "Reduit Permanent" :
             return HVACMode.AUTO
 
         elif CAMB > TAMB:
@@ -333,7 +335,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             if element["jour"] == int(jour):
                 if element["plages"][nombre_demi_heures] == 1:
                     return PRESET_COMFORT
-                else: return "Réduit"
+                else: return "Reduit"
             else: pass
 
     async def OrderToFrisquestAPI(self,key,valeur):

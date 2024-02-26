@@ -7,10 +7,10 @@
                         "default": "mdi:moon",
                         "state": {
                             "comfort": "mdi:sofa",
-                            "Réduit": "mdi:leaf",
+                            "Reduit": "mdi:leaf",
                             "boost": "mdi:rocket-launch",
                             "Hors Gel": "mdi:snowflake",
-                            "Réduit Permanent": "mdi:leaf-circle-outline",
+                            "Reduit Permanent": "mdi:leaf-circle-outline",
                             "Confort Permanent": "mdi:sofa-outline"
                         }
                     }

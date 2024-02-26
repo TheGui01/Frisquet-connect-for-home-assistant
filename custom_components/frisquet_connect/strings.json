@@ -20,10 +20,10 @@
                     "preset_mode": {
                         "state": {
                             "comfort": "Confort",
-                            "Réduit": "Réduit",
+                            "Reduit": "Réduit",
                             "boost": "Boost",
                             "Hors Gel": "Hors Gel",
-                            "Réduit Permanent": "Réduit Permanent",
+                            "Reduit Permanent": "Réduit Permanent",
                             "Confort Permanent": "Confort Permanent"
                         }
                     }
