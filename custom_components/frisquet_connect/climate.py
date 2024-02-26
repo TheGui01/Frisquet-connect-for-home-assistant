@@ -250,8 +250,8 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 _key = "ACTIVITE_BOOST_Z"+str(self.data[self.idx]["numero"])
                 self._attr_target_temperature= self.data[self.idx]["CONS_CONF"]/10
 
-            if _key == "MODE_DERO":
-                self.hvac_mode = self.modeFrisquetToHVAC(0,self.data[self.idx]["DERO"],preset_mode,self.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
+            #if _key == "MODE_DERO":
+            self.hvac_mode = self.modeFrisquetToHVAC(0,self.data[self.idx]["DERO"],preset_mode,self.data[self.idx]["CAMB"]/10,self._attr_current_temperature)
 
             self._attr_preset_mode = preset_mode
             await self.OrderToFrisquestAPI(_key,mode)
