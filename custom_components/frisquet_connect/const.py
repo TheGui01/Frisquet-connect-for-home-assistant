@@ -25,10 +25,10 @@ class ClimateEntityFeature(IntFlag):
     TARGET_TEMPERATURE = 1
 
 class PRESET_MODE(StrEnum):
-    PRESET_REDUIT= "Reduit"
-    PRESET_REDUITP= "Reduit Permanent"
-    PRESET_COMFORTP= "Confort Permanent"
-    PRESET_HG = "Hors Gel"
+    PRESET_REDUIT= "reduit"
+    PRESET_REDUITP= "reduit_permanent"
+    PRESET_COMFORTP= "confort_permanent"
+    PRESET_HG = "hors_gel"
     #BOOST = "Boost"
     #CONFORT= "Confort"
 
