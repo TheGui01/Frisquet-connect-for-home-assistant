@@ -67,7 +67,10 @@ class FrisquetGetInfo:
                                 self.data["zone"+str(i+1)]["programmation"] = response["zones"][i]["programmation"]
 
                                 self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
-                                self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
+                                if response["produit"]["chaudiere"] == None :
+                                   self.data["zone"+str(i+1)]["produit"] = "PAC"
+                                else :
+                                  self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
                                 self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
                                 self.data["zone"+str(i+1)]["nomInstall"] = response["nom"]
                                 self.data["zone"+str(i+1)]["token"]=json_data["token"]

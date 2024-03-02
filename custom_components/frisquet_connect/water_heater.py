@@ -22,7 +22,7 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
     my_api = hass.data[DOMAIN][entry.unique_id]
 
     coordinator = MyCoordinator(hass, my_api)
-    if "ecs"  in coordinator.my_api.data:
+    if "ecs"  in coordinator.my_api.data and "MODE_ECS" in coordinator.my_api.data["ecs"]  :
         entity = FrisquetWaterHeater(entry,coordinator.my_api,"ecs")
         async_add_entities([entity],update_before_add=False)
 
