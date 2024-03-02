@@ -77,13 +77,20 @@ class FrisquetGetInfo:
                                 #To test T_EXT
                                 #self.data["zone"+str(i+1)]["T_EXT"] = 50
 
+                            _LOGGER.debug("In PoolFrisquestAPI data after for :'%s",self.data)
                             self.data["ecs"] = response["ecs"]
                             self.previousdata= self.data
                             await _session.close()
                             if idx == 0:
+                              _LOGGER.debug("In PoolFrisquestAPI data idx==0  :'%s",self.data)
                               return self.data
-                            else: return self.data[idx]
+                            else:
+                              _LOGGER.debug("In PoolFrisquestAPI data idx!=0  :'%s",self.data)
+                              return self.data[idx]
+
+
                       else:
+                         _LOGGER.debug("In PoolFrisquestAPI No zones found in responses :'%s",self.previousdata)
                          await _session.close()
                          #self.data[idx]:dict = {}
                          #self.data[idx].update({"date_derniere_remontee": 0})
@@ -91,6 +98,8 @@ class FrisquetGetInfo:
 
                     except:
                       await _session.close()
+                      _LOGGER.debug("In PoolFrisquestAPI No zones found in responses :'%s",self.data[idx])
                       self.data[idx] = {}
                       self.data[idx].update({"date_derniere_remontee": 0})
+                      _LOGGER.debug("In PoolFrisquestAPI Error exception :'%s",self.data[idx])
                       return self.data[idx]
