@@ -58,7 +58,7 @@ class FrisquetGetInfo:
                       if "zones"  in response or idx == 0:
                             for i in range(len(response["zones"])):
                               if response["zones"][i]["numero"]!= "":
-                                self.data["zone"+str(i+1)]:dict = {}
+                                self.data["zone"+str(i+1)] = {}
                                 self.data["zone"+str(i+1)] = response["zones"][i]["carac_zone"]
                                 self.data["zone"+str(i+1)]["boost_disponible"] = response["zones"][i]["boost_disponible"]
                                 self.data["zone"+str(i+1)]["identifiant"] = response["zones"][i]["identifiant"]
@@ -91,6 +91,6 @@ class FrisquetGetInfo:
 
                     except:
                       await _session.close()
-                      self.data[idx]:dict = {}
+                      self.data[idx] = {}
                       self.data[idx].update({"date_derniere_remontee": 0})
                       return self.data[idx]

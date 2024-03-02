@@ -38,6 +38,7 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         data.update(user_input)
         _LOGGER.debug("_user_input=%s", data)
         data = await FrisquetGetInfo.getTokenAndInfo(self,data,0)
+        _LOGGER.debug("Config_Flow data=%s", data)
         self.datadict :dict = data["zone1"]
         await self.async_set_unique_id(str(self.datadict["identifiant_chaudiere"]))
         return self.async_create_entry(title=self.datadict["nomInstall"],data=data)
