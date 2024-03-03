@@ -123,8 +123,8 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.zoneNR: str = self.data[idx]["numero"]
         FrisquetConnectEntity.token = self.data[idx]["token"]
         FrisquetConnectEntity.Devicename=self.data[idx]["produit"]
-        if self.data["ecs"]["MODE_ECS"] is not  None :
-            FrisquetConnectEntity.id_ECS = self.data["ecs"]["MODE_ECS"]["id"]
+        if self.coordinator.data["ecs"]["MODE_ECS"] is not  None :
+            FrisquetConnectEntity.id_ECS = self.coordinator.data["ecs"]["MODE_ECS"]["id"]
         FrisquetConnectEntity.Mode = self.data[idx]["MODE"]
         FrisquetConnectEntity.Selecteur=self.data[idx]["SELECTEUR"] # 5 Auto, 6 Permanent
         FrisquetConnectEntity.Derogation=self.data[idx]["DERO"]
