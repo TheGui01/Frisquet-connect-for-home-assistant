@@ -31,10 +31,13 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
     _LOGGER.debug("In SENSOR.py asyncsetup entry coordinator = MyCoordinator")
     _LOGGER.debug("In SENSOR.py asyncsetup entry2 %s'", coordinator.my_api)
     entitylist=[]
-    entityC = ConsoCHF(entry,coordinator.my_api,"zone1")
-    entitylist.append(entityC)
-    entityS = ConsoSAN(entry,coordinator.my_api,"zone1")
-    entitylist.append(entityS)
+    if "energy" in coordinator.my_api.data["zone1"].keys() :
+        if "CHF" in coordinator.my_api.data["zone1"]["energy"].keys():
+            entityC = ConsoCHF(entry,coordinator.my_api,"zone1")
+            entitylist.append(entityC)
+        if "SAN" in coordinator.my_api.data["zone1"]["energy"].keys():
+            entityS = ConsoSAN(entry,coordinator.my_api,"zone1")
+            entitylist.append(entityS)
     entity = FrisquetThermometer(entry,coordinator.my_api,"zone1")
     entitylist.append(entity)
     if "zone2"  in coordinator.my_api.data:
@@ -111,9 +114,6 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
 
         self._attr_unique_id = "CHF"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(9)
         self._attr_name = "Consomation Chauffage"
-
-
-
         self._attr_has_entity_name = True
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         self._attr_unit_of_measurement = "kWh"
@@ -122,7 +122,6 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
 
         self.data[idx] :dict ={}
         self.data[idx].update(coordinator.data[idx])
-        _LOGGER.debug("Thermometer init state : %s", self._attr_native_value)
 
     @property
     def icon(self) -> str | None:
