@@ -2,7 +2,7 @@ import logging
 import aiohttp
 from .const import AUTH_API,API_URL
 from homeassistant.config_entries import ConfigEntry
-
+from datetime import datetime
 _LOGGER = logging.getLogger(__name__)
 
 class FrisquetGetInfo:
@@ -68,7 +68,7 @@ class FrisquetGetInfo:
 
                                 self.data["zone"+str(i+1)]["date_derniere_remontee"] = response["date_derniere_remontee"]
                                 if response["produit"]["chaudiere"] == None :
-                                   self.data["zone"+str(i+1)]["produit"] = "PAC"
+                                   self.data["zone"+str(i+1)]["produit"] = "Not defined"
                                 else :
                                   self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
                                 self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
@@ -80,10 +80,31 @@ class FrisquetGetInfo:
                                 #To test T_EXT
                                 #self.data["zone"+str(i+1)]["T_EXT"] = 50
 
-                            _LOGGER.debug("In PoolFrisquestAPI data after for :'%s",self.data)
+                            #_LOGGER.debug("In PoolFrisquestAPI data after for :'%s",self.data)
                             self.data["ecs"] = response["ecs"]
                             self.previousdata= self.data
                             await _session.close()
+                            if i == 0:
+                              _url2 = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
+
+                              _session2 = aiohttp.ClientSession(headers="")
+                              _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url2)
+
+                              async with await _session2.get(url=_url2) as resp2:
+                              #if idx == 0:   ##if else to test no response from server
+                                response2 = await resp2.json()
+                                _LOGGER.debug("response API energy :'%s",response2)
+                              #self.data["zone"+str(i+1)]["energy"] = response2
+                              j=0
+                              while ( response2["CHF"][j]["mois"] != datetime.now().month and response2["CHF"][j]["annee"] != datetime.now().year ):
+                                j = j+1
+                              self.data["zone"+str(i+1)]["energy"] = {}
+                              self.data["zone"+str(i+1)]["energy"]["CHF"] = response2["CHF"][j]["valeur"]
+                              if response2["SAN"] is not None:
+                                self.data["zone"+str(i+1)]["energy"]["SAN"] = response2["SAN"][j]["valeur"]
+
+                            await _session2.close()
+
                             if idx == 0:
                               _LOGGER.debug("In PoolFrisquestAPI data idx==0  :'%s",self.data)
                               return self.data

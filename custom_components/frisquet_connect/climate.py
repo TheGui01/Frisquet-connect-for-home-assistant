@@ -88,6 +88,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
             if self.idx =="zone1":
+                #FrisquetConnectEntity.Conso = self.data[self.idx]["energy"]
                 if self.data[self.idx]["T_EXT"] is not None:
                     FrisquetConnectEntity.T_EXT = self.data[self.idx]["T_EXT"] /10
                 if self.data["ecs"]["MODE_ECS"] is not None:
@@ -139,6 +140,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[idx]["CONS_CONF"] / 10,self.data[idx]["CONS_RED"] / 10,self.data[idx]["CONS_HG"] / 10)
         if self.data[idx]["T_EXT"] is not None:
                 FrisquetConnectEntity.T_EXT = self.data[idx]["T_EXT"] / 10
+        #if idx == 'zone1':
+        #    FrisquetConnectEntity.Conso = self.data[idx]["energy"]
+
 
     @property
     def device_info(self) -> DeviceInfo:

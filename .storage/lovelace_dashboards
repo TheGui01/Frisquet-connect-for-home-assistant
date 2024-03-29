@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace_dashboards",
+  "data": {
+    "items": [
+      {
+        "id": "dashboard_test",
+        "show_in_sidebar": true,
+        "icon": "mdi:account-group",
+        "title": "test",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "dashboard-test"
+      }
+    ]
+  }
+}

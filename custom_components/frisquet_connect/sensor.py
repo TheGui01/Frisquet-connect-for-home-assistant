@@ -10,7 +10,9 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,)
 from .climate import MyCoordinator, FrisquetConnectEntity
+from homeassistant.const import UnitOfEnergy
 from .const import DOMAIN
+
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,)
 from homeassistant.helpers.entity import DeviceInfo
@@ -29,6 +31,10 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
     _LOGGER.debug("In SENSOR.py asyncsetup entry coordinator = MyCoordinator")
     _LOGGER.debug("In SENSOR.py asyncsetup entry2 %s'", coordinator.my_api)
     entitylist=[]
+    entityC = ConsoCHF(entry,coordinator.my_api,"zone1")
+    entitylist.append(entityC)
+    entityS = ConsoSAN(entry,coordinator.my_api,"zone1")
+    entitylist.append(entityS)
     entity = FrisquetThermometer(entry,coordinator.my_api,"zone1")
     entitylist.append(entity)
     if "zone2"  in coordinator.my_api.data:
@@ -41,6 +47,100 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
         entitylist.append(entity3)
 
     async_add_entities(entitylist,update_before_add=False)
+
+class ConsoSAN(SensorEntity,CoordinatorEntity):
+    data: dict = {}
+    async def async_update(self):
+        _LOGGER.debug("In sensor.py async update SAN %s",self)
+
+        self._attr_native_value = self.coordinator.data[self.idx]["energy"]["SAN"]
+        self._attr_state = self.coordinator.data[self.idx]["energy"]["SAN"]
+
+
+    def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
+
+        _LOGGER.debug("ConsoEnergy Sensor SAN INIT Coordinator : %s", coordinator)
+        super().__init__(coordinator)
+        self.idx = idx
+
+        self._attr_unique_id = "SAN"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(9)
+        self._attr_name = "Consomation Eau Chaude"
+
+
+        self._attr_has_entity_name = True
+        self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
+        self._attr_unit_of_measurement = "kWh"
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        self._attr_native_value = coordinator.data[idx]["energy"]["SAN"]
+
+        self.data[idx] :dict ={}
+        self.data[idx].update(coordinator.data[idx])
+
+    @property
+    def icon(self) -> str | None:
+        return "mdi:gas-burner"
+
+    @property
+    def should_poll(self) -> bool:
+        """Poll for those entities"""
+        return True
+
+    @property
+    def device_class(self) -> SensorDeviceClass | None:
+        return SensorDeviceClass.ENERGY
+
+    @property
+    def state_class(self) -> SensorStateClass | None:
+        return SensorStateClass.TOTAL
+
+
+class ConsoCHF(SensorEntity,CoordinatorEntity):
+    data: dict = {}
+    async def async_update(self):
+        _LOGGER.debug("In sensor.py CHF async update %s",self)
+
+        self._attr_native_value = self.coordinator.data[self.idx]["energy"]["CHF"]
+        self._attr_state = self.coordinator.data[self.idx]["energy"]["CHF"]
+
+
+    def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
+
+        _LOGGER.debug("ConsoEnergy Sensor INIT Coordinator : %s", coordinator)
+        super().__init__(coordinator)
+        self.idx = idx
+
+        self._attr_unique_id = "CHF"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(9)
+        self._attr_name = "Consomation Chauffage"
+
+
+
+        self._attr_has_entity_name = True
+        self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
+        self._attr_unit_of_measurement = "kWh"
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        self._attr_native_value = coordinator.data[idx]["energy"]["CHF"]
+
+        self.data[idx] :dict ={}
+        self.data[idx].update(coordinator.data[idx])
+        _LOGGER.debug("Thermometer init state : %s", self._attr_native_value)
+
+    @property
+    def icon(self) -> str | None:
+        return "mdi:gas-burner"
+
+    @property
+    def should_poll(self) -> bool:
+        """Poll for those entities"""
+        return True
+
+    @property
+    def device_class(self) -> SensorDeviceClass | None:
+        return SensorDeviceClass.ENERGY
+
+    @property
+    def state_class(self) -> SensorStateClass | None:
+        return SensorStateClass.TOTAL
+
 
 class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
     data: dict = {}
@@ -57,7 +157,6 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         self.idx = idx
-        self.idx =idx
 
         self._attr_unique_id = "T"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(9)
         self._attr_name = "Temperature extérieure"

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "energy",
+  "data": {
+    "energy_sources": [
+      {
+        "type": "gas",
+        "stat_energy_from": "sensor.consomation_chauffage",
+        "stat_cost": null,
+        "entity_energy_price": null,
+        "number_energy_price": null
+      }
+    ],
+    "device_consumption": []
+  }
+}
