@@ -96,6 +96,19 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
     def state_class(self) -> SensorStateClass | None:
         return SensorStateClass.TOTAL
 
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                (DOMAIN, self.coordinator.data[self.idx]["identifiant_chaudiere"])#self.unique_id)
+            },
+            name=self.coordinator.data[self.idx]["nomInstall"],#self.name
+            manufacturer="Frisquet",
+            model= self.coordinator.data[self.idx]["produit"],
+            serial_number=self.coordinator.data[self.idx]["identifiant_chaudiere"],
+        )
 
 class ConsoCHF(SensorEntity,CoordinatorEntity):
     data: dict = {}
@@ -140,6 +153,19 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
     def state_class(self) -> SensorStateClass | None:
         return SensorStateClass.TOTAL
 
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                (DOMAIN, self.coordinator.data[self.idx]["identifiant_chaudiere"])#self.unique_id)
+            },
+            name=self.coordinator.data[self.idx]["nomInstall"],#self.name
+            manufacturer="Frisquet",
+            model= self.coordinator.data[self.idx]["produit"],
+            serial_number=self.coordinator.data[self.idx]["identifiant_chaudiere"],
+        )
 
 class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
     data: dict = {}
