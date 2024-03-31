@@ -56,8 +56,8 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update SAN %s",self)
 
-        self._attr_native_value = self.coordinator.data[self.idx]["energy"]["SAN"]
-        self._attr_state = self.coordinator.data[self.idx]["energy"]["SAN"]
+        self._attr_native_value = FrisquetConnectEntity.ConsoSAN
+        self._attr_state = FrisquetConnectEntity.ConsoSAN
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
@@ -102,8 +102,8 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
     async def async_update(self):
         _LOGGER.debug("In sensor.py CHF async update %s",self)
 
-        self._attr_native_value = self.coordinator.data[self.idx]["energy"]["CHF"]
-        self._attr_state = self.coordinator.data[self.idx]["energy"]["CHF"]
+        self._attr_native_value = FrisquetConnectEntity.ConsoCHF
+        self._attr_state = FrisquetConnectEntity.ConsoCHF
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:

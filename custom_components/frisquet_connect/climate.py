@@ -9,7 +9,8 @@ from homeassistant.components.climate.const import (
     PRESET_BOOST
 )
 from .const import(
-     PRESET_MODE
+     PRESET_MODE,
+     HVACMode
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
@@ -87,13 +88,16 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
             self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
+
             if self.idx =="zone1":
-                #FrisquetConnectEntity.Conso = self.data[self.idx]["energy"]
                 if self.data[self.idx]["T_EXT"] is not None:
                     FrisquetConnectEntity.T_EXT = self.data[self.idx]["T_EXT"] /10
                 if self.data["ecs"]["MODE_ECS"] is not None:
                     FrisquetConnectEntity.id_ECS = self.data["ecs"]["MODE_ECS"]["id"]
-
+                if "CHF" in self.data["zone1"]["energy"].keys()  :
+                    FrisquetConnectEntity.ConsoCHF = self.data[self.idx]["energy"]["CHF"]
+                if "SAN"  in self.data["zone1"]["energy"].keys()  :
+                    FrisquetConnectEntity.ConsoSAN = self.data[self.idx]["energy"]["SAN"]
         else:
          _LOGGER.debug("In Climate.py async update No Update")
          #self.data = FrisquetGetInfo.previousdata
@@ -136,10 +140,14 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self._attr_preset_mode= self.defPreset(FrisquetConnectEntity.Selecteur, FrisquetConnectEntity.Mode,self.data[idx]["ACTIVITE_BOOST"],FrisquetConnectEntity.Derogation )
         _LOGGER.debug("Init climate  preset: %s",self._attr_preset_mode)
         self._attr_hvac_mode =  self.modeFrisquetToHVAC(FrisquetConnectEntity.Mode,FrisquetConnectEntity.Derogation,self._attr_preset_mode,self.data[idx]["CAMB"] / 10,self.data[idx]["TAMB"] /10)
-
+        _LOGGER.debug("Init climate  hvac_mode: %s",self._attr_hvac_mode)
         self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[idx]["CONS_CONF"] / 10,self.data[idx]["CONS_RED"] / 10,self.data[idx]["CONS_HG"] / 10)
         if self.data[idx]["T_EXT"] is not None:
                 FrisquetConnectEntity.T_EXT = self.data[idx]["T_EXT"] / 10
+        if "CHF" in self.data["zone1"]["energy"].keys() and idx== "zone1" :
+                FrisquetConnectEntity.ConsoCHF = self.data[idx]["energy"]["CHF"]
+        if "SAN" in self.data["zone1"]["energy"].keys() and idx== "zone1" :
+                FrisquetConnectEntity.ConsoSAN = self.data[idx]["energy"]["SAN"]
         #if idx == 'zone1':
         #    FrisquetConnectEntity.Conso = self.data[idx]["energy"]
 

@@ -22,6 +22,7 @@ HVAC_MODES = [cls.value for cls in HVACMode]
 class ClimateEntityFeature(IntFlag):
     """Supported features of the climate entity."""
     PRESET_MODE = 6
+    HVACMode
     TARGET_TEMPERATURE = 1
 
 class PRESET_MODE(StrEnum):

@@ -96,16 +96,18 @@ class FrisquetGetInfo:
                                 _LOGGER.debug("response API energy :'%s",response2)
                               #self.data["zone"+str(i+1)]["energy"] = response2
                               j=0
-                              k= -1
+
+                              consoCHF = 0
+                              consoSAN = 0
                               for j in range(len(response2["CHF"])):
-                                if int(response2["CHF"][j]["mois"]) == int(datetime.now().month) and int(response2["CHF"][j]["annee"]) == int(datetime.now().year) :
-                                  k = j
-                              #k= -1
-                              if k != -1:
-                                self.data["zone"+str(i+1)]["energy"] = {}
-                                self.data["zone"+str(i+1)]["energy"]["CHF"] = response2["CHF"][k]["valeur"]
+                                consoCHF = consoCHF + response2["CHF"][j]["valeur"]
                                 if response2["SAN"] is not None:
-                                  self.data["zone"+str(i+1)]["energy"]["SAN"] = response2["SAN"][k]["valeur"]
+                                   consoSAN = consoSAN + response2["SAN"][j]["valeur"]
+
+                              self.data["zone"+str(i+1)]["energy"] = {}
+                              self.data["zone"+str(i+1)]["energy"]["CHF"] = consoCHF
+                              if response2["SAN"] is not None:
+                                self.data["zone"+str(i+1)]["energy"]["SAN"] = consoSAN
 
                             await _session2.close()
 
