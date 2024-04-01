@@ -48,8 +48,8 @@ Switch to OFF or Chauffe has no effect.<br>
 - Consumption :<br>
 There are 2 sensors that retrieve total consumption (not on monthly basis).<br>
 You can add them into your energy dashboard to gas consumption. Value will appear 1 day you add them into it :<br>
-As Frisquet update value only once per day, each sensors will be updated over the night.<br>
-Please consider that values you will get will have 1 day offset : HA will record data at a D Day whereas it is D-1 value.<br>
-If you want more accurate value and if you have a Gazpar Gas meter (France), I recommend you to see those 2 videos below :<br>
+As Frisquet updates value only once per day, each sensor will be updated over the night.<br>
+Please consider that values you will get will have 1 day offset : HA will record data at a D day whereas it is D-1 value.<br>
+If you want more accurate values and you have a Gazpar Gas meter (France), I recommend you to see those 2 videos below :<br>
 https://youtu.be/YMdMFE2ysZE?si=W_hLeRye67dGsnlm  &  https://youtu.be/mjTrnnkuIUk?si=RKshhFiMmjamkC3i This setup allows to have accurate data that will be recorded for every 30 minutes in your energy dashboard. You can also track instant consumption with a derivative sensor.
 
