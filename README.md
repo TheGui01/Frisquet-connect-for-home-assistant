@@ -45,7 +45,7 @@ Switch to OFF or Chauffe has no effect.<br>
 
     - Boost Mode available
 
-- Consumption :
+- Consumption :<br>
 There are 2 sensors that retrieve total consumption (not on monthly basis).
 You can add them into your energy dashboard to gas consumption. Value will appear 1 day you add them into it :
 As Frisquet update value only once per day, each sensors will be updated over the night.
