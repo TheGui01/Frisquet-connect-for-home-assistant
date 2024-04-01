@@ -84,31 +84,27 @@ class FrisquetGetInfo:
                             self.data["ecs"] = response["ecs"]
                             self.previousdata= self.data
                             await _session.close()
-                            if i == 0:
-                              _url2 = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
+                            #if i == 0:
+                            _url2 = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
 
-                              _session2 = aiohttp.ClientSession(headers="")
-                              _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url2)
+                            _session2 = aiohttp.ClientSession(headers="")
+                            _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url2)
 
-                              async with await _session2.get(url=_url2) as resp2:
-                              #if idx == 0:   ##if else to test no response from server
-                                response2 = await resp2.json()
-                                _LOGGER.debug("response API energy :'%s",response2)
-                              #self.data["zone"+str(i+1)]["energy"] = response2
-                              j=0
-
-                              consoCHF = 0
-                              consoSAN = 0
-                              for j in range(len(response2["CHF"])):
-                                consoCHF = consoCHF + response2["CHF"][j]["valeur"]
-                                if response2["SAN"] is not None:
-                                   consoSAN = consoSAN + response2["SAN"][j]["valeur"]
-
-                              self.data["zone"+str(i+1)]["energy"] = {}
-                              self.data["zone"+str(i+1)]["energy"]["CHF"] = consoCHF
+                            async with await _session2.get(url=_url2) as resp2:
+                              response2 = await resp2.json()
+                              _LOGGER.debug("response API energy :'%s",response2)
+                            j=0
+                            consoCHF = 0
+                            consoSAN = 0
+                            for j in range(len(response2["CHF"])):
+                              consoCHF = consoCHF + response2["CHF"][j]["valeur"]
                               if response2["SAN"] is not None:
-                                self.data["zone"+str(i+1)]["energy"]["SAN"] = consoSAN
+                                  consoSAN = consoSAN + response2["SAN"][j]["valeur"]
 
+                            self.data["zone1"]["energy"] = {}
+                            self.data["zone1"]["energy"]["CHF"] = consoCHF
+                            if response2["SAN"] is not None:
+                              self.data["zone1"]["energy"]["SAN"] = consoSAN
                             await _session2.close()
 
                             if idx == 0:
