@@ -8,7 +8,7 @@
 [releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=relea
 
 
-# Frisquet Connect For Homme Assistant
+# Frisquet Connect For Home Assistant
 
 ![Screenshot](FrisquetDeviceSample.png)
 ![Screenshot](FrisquetDeviceSample2.png)
