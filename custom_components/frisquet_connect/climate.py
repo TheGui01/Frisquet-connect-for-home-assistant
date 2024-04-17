@@ -85,6 +85,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10
             FrisquetConnectEntity.TAMB[self.idx]= self.data[self.idx]["TAMB"] / 10
             FrisquetConnectEntity.Derogation=self.data[self.idx]["DERO"]
+            FrisquetConnectEntity.token = self.data[self.idx]["token"]
             self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
             self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
@@ -358,7 +359,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         _session = aiohttp.ClientSession(headers="")
         _IDChaudiere = FrisquetConnectEntity.IDchaudiere
         _LOGGER.debug("In OrderToFrisquestAPI IDChaudiere :'%s",_IDChaudiere)
-        _url =ORDER_API+_IDChaudiere+"?token="+self.data[idx]["token"]
+        _url =ORDER_API+_IDChaudiere+"?token="+FrisquetConnectEntity.token
         _LOGGER.debug("In OrderToFrisquestAPI with url :'%s",_url)
         headers = {
                         'Host':'fcutappli.frisquet.com',
