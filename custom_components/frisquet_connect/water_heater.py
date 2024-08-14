@@ -101,6 +101,6 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         elif idFrisquet == 3:
             return "Eco+"
         elif idFrisquet == 4:
-            return "Eco + Timer"
+            return "Eco+ Timer"
         elif idFrisquet == 5:
             return "Stop"
