@@ -1,6 +1,6 @@
 import logging
 import aiohttp
-from .const import AUTH_API,API_URL
+from .const import AUTH_API,API_URL,CONF_SITE_ID
 from homeassistant.config_entries import ConfigEntry
 from datetime import datetime
 _LOGGER = logging.getLogger(__name__)
@@ -21,6 +21,36 @@ class FrisquetGetInfo:
     async def last_update_success(self,pos2,pos3):
       _LOGGER.debug("last_update_success Frisquet API: %s  pos2: %s  pos3:  %s",self.data, pos2, pos3)
 
+    async def getSite(self,data):
+        self.data: dict = {}
+        headers = {
+                'Content-Type': 'application/json'
+                }
+        Initjson_data = {
+                "locale": "fr",
+                "email": data["email"],
+                "password": data["password"],
+                "type_client": "IOS",
+                }
+        email = data["email"]
+        password = data["password"]
+
+        _session = aiohttp.ClientSession(headers="")
+        _LOGGER.debug("In getSite Frisquet API")
+        async with await _session.post(url=AUTH_API,headers=headers,json= Initjson_data) as resp:
+          try:#_LOGGER.debug("In getToken and info json data 1 '%s'" ,self.Initjson_data)
+              json_data = await resp.json()
+              #secondsite = {"nom":"2e Site"}
+              #json_data["utilisateur"]["sites"].append(secondsite)
+              await _session.close()
+              ListSite = []
+              for i in range(len(json_data["utilisateur"]["sites"])):
+                ListSite.append(json_data["utilisateur"]["sites"][i]["nom"])
+
+              return ListSite
+          except:
+                ListSite[0] = "No Site Found"
+                return ListSite
     async def getTokenAndInfo(self,data,idx):
         self.data: dict = {}
         headers = {
@@ -41,20 +71,24 @@ class FrisquetGetInfo:
                     try:#_LOGGER.debug("In getToken and info json data 1 '%s'" ,self.Initjson_data)
                       json_data = await resp.json()
                     #_LOGGER.debug("In getToken and info json data 2 '%s'" ,self.json_data)
-                      _url = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"?token="+json_data["token"]
+                      #if CONF_SITE_ID != 0:  # To test Site 2
+                        #response["zones"].append({'boost_disponible': True, 'id': 106523, 'identifiant': 'Z1', 'numero': 1, 'nom': 'Zone 1', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
+                        #response["identifiant_chaudiere"] = 23105126180334
+                      #else :  # To test Site 2
+                      _url = API_URL+ json_data["utilisateur"]["sites"][CONF_SITE_ID]["identifiant_chaudiere"]+"?token="+json_data["token"]
                       await _session.close()
 
                       _session = aiohttp.ClientSession(headers="")
                       _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
-
+                      #  if CONF_SITE_ID == 0: # To test Site 2
                       async with await _session.get(url=_url) as resp:
-                          #if idx == 0:   ##if else to test no response from server
-                          response = await resp.json()
-                          #else:
-                          #  response = ""
-                          #to Test zone2
-                          #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
-                          _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
+                            #if idx == 0:   ##if else to test no response from server
+                            response = await resp.json()
+                            #else:
+                            #  response = ""
+                            #to Test zone2
+                            #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
+                            _LOGGER.debug("In PoolFrisquestAPI response :'%s",response)
                       if "zones"  in response or idx == 0:
                             for i in range(len(response["zones"])):
                               if response["zones"][i]["numero"]!= "":
@@ -72,7 +106,14 @@ class FrisquetGetInfo:
                                 else :
                                   self.data["zone"+str(i+1)]["produit"]=  response["produit"]["chaudiere"]+" "+response["produit"]["gamme"]+" " +response["produit"]["puissance"]
                                 self.data["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
-                                self.data["zone"+str(i+1)]["nomInstall"] = response["nom"]
+                                if "sites" in data:
+                                  self.data["nomInstall"] = data["sites"][CONF_SITE_ID]
+                                elif "nomInstall" in data:
+                                   self.data["nomInstall"] = data["nomInstall"]
+                                #if i == 0 and "sites" in data:
+                                #  self.data["zone"+str(i+1)]["nomInstall"] = data["sites"][CONF_SITE_ID]
+                                #else:
+                                #  self.data["zone"+str(i+1)]["nomInstall"] = self.data["zone1"]["nomInstall"]
                                 self.data["zone"+str(i+1)]["token"]=json_data["token"]
                                 self.data["zone"+str(i+1)]["email"]= email
                                 self.data["zone"+str(i+1)]["password"]= password
@@ -85,14 +126,17 @@ class FrisquetGetInfo:
                             self.previousdata= self.data
                             await _session.close()
                             #if i == 0:
-                            _url2 = API_URL+ json_data["utilisateur"]["sites"][0]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
+                            _url2 = API_URL+ json_data["utilisateur"]["sites"][CONF_SITE_ID]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
 
                             _session2 = aiohttp.ClientSession(headers="")
                             _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url2)
 
+                            #if CONF_SITE_ID == 0:  # To test Site 2
                             async with await _session2.get(url=_url2) as resp2:
                               response2 = await resp2.json()
                               _LOGGER.debug("response API energy :'%s",response2)
+                            #else :# To test Site 2
+                            #   response2 = {'CHF': [{'valeur': 64, 'mois': 11, 'annee': '2023'}, {'valeur': 66, 'mois': 12, 'annee': '2023'}, {'valeur': 3, 'mois': 1, 'annee': '2024'}, {'valeur': 915, 'mois': 2, 'annee': '2024'}, {'valeur': 922, 'mois': 3, 'annee': '2024'}, {'valeur': 630, 'mois': 4, 'annee': '2024'}, {'valeur': 122, 'mois': 5, 'annee': '2024'}, {'valeur': 0, 'mois': 6, 'annee': '2024'}, {'valeur': 0, 'mois': 7, 'annee': '2024'}, {'valeur': 0, 'mois': 8, 'annee': '2024'}], 'SAN': [{'valeur': 8, 'mois': 11, 'annee': '2023'}, {'valeur': 217, 'mois': 12, 'annee': '2023'}, {'valeur': 79, 'mois': 1, 'annee': '2024'}, {'valeur': 207, 'mois': 2, 'annee': '2024'}, {'valeur': 235, 'mois': 3, 'annee': '2024'}, {'valeur': 209, 'mois': 4, 'annee': '2024'}, {'valeur': 9, 'mois': 5, 'annee': '2024'}, {'valeur': 5, 'mois': 6, 'annee': '2024'}, {'valeur': 7, 'mois': 7, 'annee': '2024'}, {'valeur': 9, 'mois': 8, 'annee': '2024'}], 'max': 5000}
                             j=0
                             consoCHF = 0
                             consoSAN = 0

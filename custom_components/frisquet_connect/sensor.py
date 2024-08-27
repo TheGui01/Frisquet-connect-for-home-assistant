@@ -67,7 +67,7 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
         self.idx = idx
 
         self._attr_unique_id = "SAN"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(9)
-        self._attr_name = "Consomation Eau Chaude"
+        self._attr_name = "Consommation Eau Chaude"
 
 
         self._attr_has_entity_name = True
@@ -104,7 +104,7 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.coordinator.data[self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data[self.idx]["nomInstall"],#self.name
+            name=self.coordinator.data["nomInstall"],#self.name
             manufacturer="Frisquet",
             model= self.coordinator.data[self.idx]["produit"],
             serial_number=self.coordinator.data[self.idx]["identifiant_chaudiere"],
@@ -126,7 +126,7 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
         self.idx = idx
 
         self._attr_unique_id = "CHF"+str(coordinator.data[idx]["identifiant_chaudiere"]) + str(9)
-        self._attr_name = "Consomation Chauffage"
+        self._attr_name = "Consommation Chauffage"
         self._attr_has_entity_name = True
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         self._attr_unit_of_measurement = "kWh"
@@ -161,7 +161,7 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.coordinator.data[self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data[self.idx]["nomInstall"],#self.name
+            name=self.coordinator.data["nomInstall"],#self.name
             manufacturer="Frisquet",
             model= self.coordinator.data[self.idx]["produit"],
             serial_number=self.coordinator.data[self.idx]["identifiant_chaudiere"],
@@ -262,7 +262,7 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.coordinator.data[self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data[self.idx]["nomInstall"],#self.name
+            name=self.coordinator.data["nomInstall"],#self.name
             manufacturer="Frisquet",
             model= self.coordinator.data[self.idx]["produit"],
             serial_number=self.coordinator.data[self.idx]["identifiant_chaudiere"],

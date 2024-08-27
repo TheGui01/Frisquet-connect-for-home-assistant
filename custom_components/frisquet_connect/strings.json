@@ -1,7 +1,7 @@
 {
     "title": "Frisquet Connect",
     "config": {
-        "flow_title": "Frisquest Connect configuration",
+        "flow_title": "Frisquet Connect configuration",
         "step": {
             "user": {
                 "title": "Vos infos de connexion",
@@ -10,6 +10,13 @@
                     "email": "E-mail (Identifiant)",
                     "password": "mot de passe"
                 }
+            },
+            "2": {
+                "data": {
+                    "site": "Site"
+                },
+                "title": "Plusieurs installations trouvées",
+                "description": "Sélectionnez le site"
             }
         }
     },

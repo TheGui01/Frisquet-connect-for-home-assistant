@@ -61,7 +61,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.coordinator.data["zone1"]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data["zone1"]["nomInstall"],#self.name
+            name=self.coordinator.data["nomInstall"],#self.name
             manufacturer="Frisquet",
             model= self.coordinator.data["zone1"]["produit"],
             serial_number=self.coordinator.data["zone1"]["identifiant_chaudiere"],

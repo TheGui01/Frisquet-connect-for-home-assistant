@@ -7,6 +7,7 @@ PLATFORMS: list[Platform] = [Platform.CLIMATE,Platform.SENSOR,Platform.WATER_HEA
 AUTH_API        = "https://fcutappli.frisquet.com/api/v1/authentifications"
 API_URL         = "https://fcutappli.frisquet.com/api/v1/sites/"
 ORDER_API      = "https://fcutappli.frisquet.com/api/v1/ordres/"
+CONF_SITE_ID = 0
 
 DEVICE_MANUFACTURER = "Frisquet"
 

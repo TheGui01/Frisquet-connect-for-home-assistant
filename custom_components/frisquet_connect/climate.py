@@ -161,7 +161,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.data[self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.data[self.idx]["nomInstall"],#self.name
+            name=self.coordinator.data["nomInstall"],#self.name
             manufacturer="Frisquet",
             model= self.data[self.idx]["produit"],
             serial_number=self.data[self.idx]["identifiant_chaudiere"],
