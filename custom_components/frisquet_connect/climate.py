@@ -36,7 +36,7 @@ from homeassistant.helpers.event import (
 
 from datetime import timedelta, datetime
 import time
-SCAN_INTERVAL = timedelta(seconds=300)
+SCAN_INTERVAL = timedelta(seconds=30)
 
 #from .sensor import FrisquetThermometer
 from .const import DOMAIN,AUTH_API,API_URL,DEVICE_MANUFACTURER,ORDER_API
@@ -80,6 +80,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             site = self.coordinator.data["nomInstall"]
             siteID = self.coordinator.data[site]["siteID"]
             self.data[self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[site][self.idx],self.idx,siteID)
+            self.data["ecs"] = self.data[site]["ecs"]
         except:
             self.data[self.idx]["date_derniere_remontee"] = 0
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
@@ -396,7 +397,7 @@ class MyCoordinator(DataUpdateCoordinator):
             # Name of the data. For logging purposes.
             name= "My sensor",
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=300),
+            update_interval=timedelta(seconds=30),
 
         )
         self.my_api = my_api
