@@ -36,7 +36,7 @@ from homeassistant.helpers.event import (
 
 from datetime import timedelta, datetime
 import time
-SCAN_INTERVAL = timedelta(seconds=30)
+SCAN_INTERVAL = timedelta(seconds=300)
 
 #from .sensor import FrisquetThermometer
 from .const import DOMAIN,AUTH_API,API_URL,DEVICE_MANUFACTURER,ORDER_API
@@ -397,7 +397,7 @@ class MyCoordinator(DataUpdateCoordinator):
             # Name of the data. For logging purposes.
             name= "My sensor",
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=30),
+            update_interval=timedelta(seconds=300),
 
         )
         self.my_api = my_api
