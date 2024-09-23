@@ -16,7 +16,9 @@ async def async_setup_entry (hass: HomeAssistant, entry: ConfigEntry) -> bool:  
     """Creation des entités à partir d'une configEntry"""
     _LOGGER.debug("In async_setup_entry __init__.py ")
     my_api = FrisquetGetInfo( entry.data)
-    await my_api.getTokenAndInfo(entry.data["zone1"],0)
+    SiteID = entry.data["SiteID"]
+    data = entry.data
+    await my_api.getTokenAndInfo(data["zone1"],0,SiteID)
     _LOGGER.debug(
         "Appel de async_setup_entry entry: entry_id='%s', data='%s",
         entry.entry_id,

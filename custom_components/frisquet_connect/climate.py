@@ -111,7 +111,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         super().__init__(coordinator)
         self.idx = idx
         self.data[idx] = {}
-        self.data[idx].update(coordinator.data[idx])
+        self.data.update(coordinator.data[coordinator.data["nomInstall"]])
         FrisquetConnectEntity.tz= coordinator.data["timezone"]
         _LOGGER.debug("Init Entity='%s'", self.data[idx])
         self._attr_unique_id = str(self.data[idx]["identifiant_chaudiere"]) + str(self.data[idx]["numero"])
@@ -129,8 +129,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.zoneNR: str = self.data[idx]["numero"]
         FrisquetConnectEntity.token = self.data[idx]["token"]
         FrisquetConnectEntity.Devicename=self.data[idx]["produit"]
-        if self.coordinator.data["ecs"]["MODE_ECS"] is not  None :
-            FrisquetConnectEntity.id_ECS = self.coordinator.data["ecs"]["MODE_ECS"]["id"]
+
+        if self.data["ecs"]["MODE_ECS"] is not  None :
+            FrisquetConnectEntity.id_ECS = self.data["ecs"]["MODE_ECS"]["id"]
         FrisquetConnectEntity.Mode = self.data[idx]["MODE"]
         FrisquetConnectEntity.Selecteur=self.data[idx]["SELECTEUR"] # 5 Auto, 6 Permanent
         FrisquetConnectEntity.Derogation=self.data[idx]["DERO"]
@@ -416,3 +417,6 @@ class MyCoordinator(DataUpdateCoordinator):
 
         except: #NameError as err:
             _LOGGER.debug(    "in mycoordinator _async_update_data ERROR") #:'%s'", err)
+
+    async def async_add_listener(self):
+        _LOGGER.debug(    "in mycoordinator async_add_listener") #:'%s'", err)

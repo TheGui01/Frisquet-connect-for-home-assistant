@@ -17,15 +17,19 @@ SCAN_INTERVAL = timedelta(seconds=150)
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
-    _LOGGER.debug("Sensors setup_entry")
+    _LOGGER.debug("water heater setup_entry")
 
     my_api = hass.data[DOMAIN][entry.unique_id]
 
     coordinator = MyCoordinator(hass, my_api)
-    if "ecs"  in coordinator.my_api.data and "MODE_ECS" in coordinator.my_api.data["ecs"]  :
-        entity = FrisquetWaterHeater(entry,coordinator.my_api,"ecs")
+    site = coordinator.my_api.data["nomInstall"]
+    ##coordinator["site"] = site
+    if "ecs"  in coordinator.my_api.data[site] and "MODE_ECS" in coordinator.my_api.data[site]["ecs"]  :
+        entity = FrisquetWaterHeater(entry,coordinator.my_api,"ecs")##.data[site]
         async_add_entities([entity],update_before_add=False)
 
+async def async_add_listener():
+        _LOGGER.debug("water heater add_listener")
 
 class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     data: dict = {}
@@ -45,13 +49,15 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
 
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
-
+        self.site = config_entry.data["nomInstall"]
         self._attr_name = "Chauffe eau"
-        self._attr_unique_id = "WH"+str(coordinator.data["zone1"]["identifiant_chaudiere"]) + str(9)
+        self._attr_unique_id = "WH"+str(coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]) + str(9)
         self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
-        self.current_operation =  self.FrisquetToOperation(coordinator.data["ecs"]["MODE_ECS"]["id"])
+        self.current_operation =  self.FrisquetToOperation(coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"])
         self.temperature_unit = "°C"
         self._attr_supported_features   =  WaterHeaterEntityFeature.OPERATION_MODE
+        self.site = config_entry.data["nomInstall"]
+
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -59,12 +65,12 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.coordinator.data["zone1"]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.coordinator.data[self.site]["zone1"]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data["nomInstall"],#self.name
+            name=self.site,#self.name
             manufacturer="Frisquet",
-            model= self.coordinator.data["zone1"]["produit"],
-            serial_number=self.coordinator.data["zone1"]["identifiant_chaudiere"],
+            model= self.coordinator.data[self.site]["zone1"]["produit"],
+            serial_number=self.coordinator.data[self.site]["zone1"]["identifiant_chaudiere"],
         )
 
     @property
