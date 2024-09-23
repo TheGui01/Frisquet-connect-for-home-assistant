@@ -28,18 +28,13 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
-from homeassistant.helpers.event import (
-    async_track_state_change_event,
-    async_track_time_interval,
-    async_track_state_change_event,
-)
 
 from datetime import timedelta, datetime
 import time
 SCAN_INTERVAL = timedelta(seconds=300)
 
 #from .sensor import FrisquetThermometer
-from .const import DOMAIN,AUTH_API,API_URL,DEVICE_MANUFACTURER,ORDER_API
+from .const import DOMAIN,ORDER_API
 from .frisquetAPI import FrisquetGetInfo
 _LOGGER = logging.getLogger(__name__)
 async def async_timeout():
@@ -397,7 +392,7 @@ class MyCoordinator(DataUpdateCoordinator):
             # Name of the data. For logging purposes.
             name= "My sensor",
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=300),
+            update_interval=SCAN_INTERVAL,
 
         )
         self.my_api = my_api
