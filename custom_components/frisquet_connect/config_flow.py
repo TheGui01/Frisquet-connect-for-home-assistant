@@ -24,7 +24,7 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
                 "config_flow step user (1). 1er appel : pas de user_input -> "
                 "on affiche le form user_form"
             )
-
+            FrisquetConfigFlow.data
             return self.async_show_form(step_id="user", data_schema=vol.Schema(
                 {
                     vol.Required("email"): str,

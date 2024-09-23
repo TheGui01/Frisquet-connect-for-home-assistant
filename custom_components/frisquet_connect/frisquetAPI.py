@@ -121,9 +121,11 @@ class FrisquetGetInfo:
                                 self.data[data["sites"][site]]["zone"+str(i+1)]["identifiant_chaudiere"] = response["identifiant_chaudiere"]
                                 if "sites" in data:
                                   self.data[data["sites"][site]]["nomInstall"] = data["sites"][site]
+                                  self.data[data["sites"][site]]["siteID"]   = site
                                   self.data["nomInstall"] = data["sites"][site]
                                 elif "nomInstall" in data:
                                   self.data[data["sites"][site]]["nomInstall"] = data["nomInstall"]
+                                  self.data[data["sites"][site]]["siteID"] =  site
                                   self.data["nomInstall"] = data["nomInstall"]
 
                                 self.data[data["sites"][site]]["zone"+str(i+1)]["token"]=json_data["token"]
