@@ -49,14 +49,14 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
 
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
-        self.site = config_entry.data["nomInstall"]
-        self._attr_name = "Chauffe eau"
+        site = config_entry.title
+        self.site = site
+        self._attr_name = "Chauffe-eau " + self.site
         self._attr_unique_id = "WH"+str(coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]) + str(9)
         self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
         self.current_operation =  self.FrisquetToOperation(coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"])
         self.temperature_unit = "°C"
         self._attr_supported_features   =  WaterHeaterEntityFeature.OPERATION_MODE
-        self.site = config_entry.data["nomInstall"]
 
 
     @property

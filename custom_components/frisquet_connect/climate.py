@@ -79,24 +79,25 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         except:
             self.data[self.idx]["date_derniere_remontee"] = 0
         if float(self.data[self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
-            _LOGGER.debug("In Climate.py async update in progress %s",self.data[self.idx]["token"])
-            self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10
-            FrisquetConnectEntity.TAMB[self.idx]= self.data[self.idx]["TAMB"] / 10
-            FrisquetConnectEntity.Derogation=self.data[self.idx]["DERO"]
-            FrisquetConnectEntity.token = self.data[self.idx]["token"]
-            self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
-            self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
-            self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
+            if site == FrisquetConnectEntity.site:
+                _LOGGER.debug("In Climate.py async update in progress %s",self.data[self.idx]["token"])
+                self._attr_current_temperature= self.data[self.idx]["TAMB"] / 10
+                FrisquetConnectEntity.TAMB[self.idx]= self.data[self.idx]["TAMB"] / 10
+                FrisquetConnectEntity.Derogation=self.data[self.idx]["DERO"]
+                FrisquetConnectEntity.token = self.data[self.idx]["token"]
+                self._attr_preset_mode= self.defPreset(self.data[self.idx]["SELECTEUR"], self.data[self.idx]["MODE"],self.data[self.idx]["ACTIVITE_BOOST"],self.data[self.idx]["DERO"] )
+                self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[self.idx]["MODE"],self.data[self.idx]["DERO"],self._attr_preset_mode,self.data[self.idx]["CAMB"] / 10,self.data[self.idx]["TAMB"] /10)
+                self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[self.idx]["CONS_CONF"] / 10,self.data[self.idx]["CONS_RED"] / 10,self.data[self.idx]["CONS_HG"] / 10)
 
-            if self.idx =="zone1":
-                if self.data[self.idx]["T_EXT"] is not None:
-                    FrisquetConnectEntity.T_EXT = self.data[self.idx]["T_EXT"] /10
-                if self.data["ecs"]["MODE_ECS"] is not None:
-                    FrisquetConnectEntity.id_ECS = self.data["ecs"]["MODE_ECS"]["id"]
-                if "CHF" in self.data["zone1"]["energy"].keys()  :
-                    FrisquetConnectEntity.ConsoCHF = self.data[self.idx]["energy"]["CHF"]
-                if "SAN"  in self.data["zone1"]["energy"].keys()  :
-                    FrisquetConnectEntity.ConsoSAN = self.data[self.idx]["energy"]["SAN"]
+                if self.idx =="zone1":
+                    if self.data[self.idx]["T_EXT"] is not None:
+                        FrisquetConnectEntity.T_EXT = self.data[self.idx]["T_EXT"] /10
+                    if self.data["ecs"]["MODE_ECS"] is not None:
+                        FrisquetConnectEntity.id_ECS = self.data["ecs"]["MODE_ECS"]["id"]
+                    if "CHF" in self.data["zone1"]["energy"].keys()  :
+                        FrisquetConnectEntity.ConsoCHF = self.data[self.idx]["energy"]["CHF"]
+                    if "SAN"  in self.data["zone1"]["energy"].keys()  :
+                        FrisquetConnectEntity.ConsoSAN = self.data[self.idx]["energy"]["SAN"]
         else:
          _LOGGER.debug("In Climate.py async update No Update")
          #self.data = FrisquetGetInfo.previousdata
@@ -110,6 +111,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self.idx = idx
         self.data[idx] = {}
         self.data.update(coordinator.data[coordinator.data["nomInstall"]])
+        FrisquetConnectEntity.site = config_entry.title #coordinator.data["nomInstall"]
         FrisquetConnectEntity.tz= coordinator.data["timezone"]
         _LOGGER.debug("Init Entity='%s'", self.data[idx])
         self._attr_unique_id = str(self.data[idx]["identifiant_chaudiere"]) + str(self.data[idx]["numero"])

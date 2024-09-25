@@ -65,8 +65,9 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
         _LOGGER.debug("ConsoEnergy Sensor SAN INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         self.idx = idx
-
-        self._attr_unique_id = "SAN"+str(coordinator.data[coordinator.data["nomInstall"]][idx]["identifiant_chaudiere"]) + str(9)
+        site = coordinator.data["nomInstall"]
+        self.site = site
+        self._attr_unique_id = "SAN"+str(coordinator.data[site][idx]["identifiant_chaudiere"]) + str(9)
         self._attr_name = "Consommation Eau Chaude"
 
 
@@ -74,10 +75,10 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         self._attr_unit_of_measurement = "kWh"
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_native_value = coordinator.data[coordinator.data["nomInstall"]][idx]["energy"]["SAN"]
+        self._attr_native_value = coordinator.data[site][idx]["energy"]["SAN"]
 
         self.data[idx]  ={}
-        self.data[idx].update(coordinator.data[coordinator.data["nomInstall"]][idx])
+        self.data[idx].update(coordinator.data[site][idx])
 
     @property
     def icon(self) -> str | None:
@@ -102,12 +103,12 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data["nomInstall"],#self.name
+            name=self.site,#self.name
             manufacturer="Frisquet",
-            model= self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["produit"],
-            serial_number=self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"],
+            model= self.coordinator.data[self.site][self.idx]["produit"],
+            serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
         )
 
 class ConsoCHF(SensorEntity,CoordinatorEntity):
@@ -124,17 +125,18 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
         _LOGGER.debug("ConsoEnergy Sensor INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         self.idx = idx
-
-        self._attr_unique_id = "CHF"+str(coordinator.data[coordinator.data["nomInstall"]][idx]["identifiant_chaudiere"]) + str(9)
+        site = config_entry.title
+        self.site = site
+        self._attr_unique_id = "CHF"+str(coordinator.data[site][idx]["identifiant_chaudiere"]) + str(9)
         self._attr_name = "Consommation Chauffage"
         self._attr_has_entity_name = True
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         self._attr_unit_of_measurement = "kWh"
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_native_value = coordinator.data[coordinator.data["nomInstall"]][idx]["energy"]["CHF"]
+        self._attr_native_value = coordinator.data[site][idx]["energy"]["CHF"]
 
         self.data[idx]  ={}
-        self.data[idx].update(coordinator.data[coordinator.data["nomInstall"]][idx])
+        self.data[idx].update(coordinator.data[site][idx])
 
     @property
     def icon(self) -> str | None:
@@ -159,12 +161,12 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data["nomInstall"],#self.name
+            name=self.site,#self.name
             manufacturer="Frisquet",
-            model= self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["produit"],
-            serial_number=self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"],
+            model= self.coordinator.data[self.site][self.idx]["produit"],
+            serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
         )
 
 class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
@@ -182,10 +184,11 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         self.idx = idx
-
-        self._attr_unique_id = "T"+str(coordinator.data[coordinator.data["nomInstall"]][idx]["identifiant_chaudiere"]) + str(9)
+        site = config_entry.title
+        self.site = site
+        self._attr_unique_id = "T"+str(coordinator.data[site][idx]["identifiant_chaudiere"]) + str(9)
         self._attr_name = "Temperature extérieure"
-        self._attr_native_value =  coordinator.data[coordinator.data["nomInstall"]][idx]["T_EXT"]/10
+        self._attr_native_value =  coordinator.data[site][idx]["T_EXT"]/10
 
 
         self._attr_has_entity_name = True
@@ -194,7 +197,7 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
 
         #self._attr_state = coordinator.data[idx]["TAMB"]/10
         self.data[idx]  ={}
-        self.data[idx].update(coordinator.data[coordinator.data["nomInstall"]][idx])
+        self.data[idx].update(coordinator.data[site][idx])
         _LOGGER.debug("Thermometer init state : %s", self._attr_native_value)
 
 
@@ -204,12 +207,12 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
             name=self.coordinator.data[self.idx]["nomInstall"],#self.name
             manufacturer="Frisquet",
-            model= self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["produit"],
-            serial_number=self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"],
+            model= self.coordinator.data[self.site][self.idx]["produit"],
+            serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
         )
 
     @property
@@ -244,14 +247,17 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
         _LOGGER.debug("Sensors INIT Coordinator : %s", coordinator)
         super().__init__(coordinator)
         self.idx =idx
-        self._attr_unique_id = "T"+str(coordinator.data[coordinator.data["nomInstall"]][idx]["identifiant_chaudiere"]) + str(coordinator.data[coordinator.data["nomInstall"]][idx]["numero"])
-        self._attr_name = "Temperature " +coordinator.data[coordinator.data["nomInstall"]][idx]["nom"]
-        self._attr_native_value =  coordinator.data[coordinator.data["nomInstall"]][idx]["TAMB"]/10
+
+        site = coordinator.data["nomInstall"]
+        self.site = site
+        self._attr_unique_id = "T"+str(coordinator.data[site][idx]["identifiant_chaudiere"]) + str(coordinator.data[site][idx]["numero"])
+        self._attr_name = "Temperature " +coordinator.data[site][idx]["nom"]
+        self._attr_native_value =  coordinator.data[site][idx]["TAMB"]/10
         self._attr_has_entity_name = True
         self._attr_native_unit_of_measurement = "°C"
         self._attr_unit_of_measurement = "°C"
         self.data[idx]  ={}
-        self.data[idx].update(coordinator.data[coordinator.data["nomInstall"]][idx])
+        self.data[idx].update(coordinator.data[site][idx])
 
 
     @property
@@ -260,12 +266,12 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data["nomInstall"],#self.name
+            name=self.site,#self.name
             manufacturer="Frisquet",
-            model= self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["produit"],
-            serial_number=self.coordinator.data[self.coordinator.data["nomInstall"]][self.idx]["identifiant_chaudiere"],
+            model= self.coordinator.data[self.site][self.idx]["produit"],
+            serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
         )
 
     @property
