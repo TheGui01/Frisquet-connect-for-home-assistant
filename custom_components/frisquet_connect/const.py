@@ -40,5 +40,7 @@ class WaterHeaterModes(StrEnum):
     ECOT = "Eco Timer"
     ECOP = "Eco+"
     ECOPT  = "Eco+ Timer"
+    ON = "On"
     OFF = "Stop"
+    OFFF = "Off"
 

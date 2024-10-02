@@ -55,9 +55,9 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
     data: dict = {}
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update SAN %s",self)
-
-        self._attr_native_value = FrisquetConnectEntity.ConsoSAN
-        self._attr_state = FrisquetConnectEntity.ConsoSAN
+        if self.unique_id == FrisquetConnectEntity.IDchaudiere :
+            self._attr_native_value = FrisquetConnectEntity.ConsoSAN
+            self._attr_state = FrisquetConnectEntity.ConsoSAN
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
@@ -115,9 +115,9 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
     data: dict = {}
     async def async_update(self):
         _LOGGER.debug("In sensor.py CHF async update %s",self)
-
-        self._attr_native_value = FrisquetConnectEntity.ConsoCHF
-        self._attr_state = FrisquetConnectEntity.ConsoCHF
+        if self.unique_id == SensorEntity._attr_unique_id :
+            self._attr_native_value = FrisquetConnectEntity.ConsoCHF
+            self._attr_state = FrisquetConnectEntity.ConsoCHF
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
@@ -175,9 +175,9 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
 
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
-
-        self._attr_native_value = FrisquetConnectEntity.T_EXT
-        self._attr_state = FrisquetConnectEntity.T_EXT
+        if self.unique_id == FrisquetConnectEntity.IDchaudiere :
+            self._attr_native_value = FrisquetConnectEntity.T_EXT
+            self._attr_state = FrisquetConnectEntity.T_EXT
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
 
@@ -209,7 +209,7 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data[self.idx]["nomInstall"],#self.name
+            name=self.coordinator.data["nomInstall"],#self.name
             manufacturer="Frisquet",
             model= self.coordinator.data[self.site][self.idx]["produit"],
             serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
@@ -237,9 +237,9 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
     _hass: HomeAssistant
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
-
-        self._attr_native_value = FrisquetConnectEntity.TAMB[self.idx]
-        self._attr_state = FrisquetConnectEntity.TAMB[self.idx]
+        if self.unique_id == FrisquetConnectEntity.IDchaudiere :
+            self._attr_native_value = FrisquetConnectEntity.TAMB[self.idx]
+            self._attr_state = FrisquetConnectEntity.TAMB[self.idx]
         _LOGGER.debug("In sensor.py async update Climeentitytemp %s" ,FrisquetConnectEntity.TAMB[self.idx])
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:

@@ -54,7 +54,7 @@ class FrisquetGetInfo:
                 ListSite[0] = "No Site Found"
                 return ListSite
     async def getTokenAndInfo(self,data,idx,site):
-        self.data: dict = {}
+        #self.data: dict = {}
         headers = {
                 'Content-Type': 'application/json'
                 }

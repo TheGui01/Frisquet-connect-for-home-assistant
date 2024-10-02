@@ -37,7 +37,7 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         sites = []
         sites = await FrisquetGetInfo.getSite(self,FrisquetConfigFlow.data)
         FrisquetConfigFlow.data["sites"] = sites
-        return await self.async_step_2( )
+        return await self.async_step_2()
 
     async def async_step_2(self,user_input : dict | None = None  ) :
             if len(FrisquetConfigFlow.data["sites"])>1:

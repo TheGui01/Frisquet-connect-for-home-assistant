@@ -24,9 +24,15 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
     coordinator = MyCoordinator(hass, my_api)
     site = coordinator.my_api.data["nomInstall"]
     ##coordinator["site"] = site
-    if "ecs"  in coordinator.my_api.data[site] and "MODE_ECS" in coordinator.my_api.data[site]["ecs"]  :
-        entity = FrisquetWaterHeater(entry,coordinator.my_api,"ecs")##.data[site]
-        async_add_entities([entity],update_before_add=False)
+
+    #if "ecs"  in coordinator.my_api.data[site] and "MODE_ECS" in coordinator.my_api.data[site]["ecs"]  :
+    if "ecs"  in coordinator.my_api.data[site] :
+        if coordinator.my_api.data[site]["ecs"]["TYPE_ECS"] is not None :
+            entity = FrisquetWaterHeater(entry,coordinator.my_api,"MODE_ECS")##.data[site]
+            async_add_entities([entity],update_before_add=False)
+        elif coordinator.my_api.data[site]["ecs"]["MODE_ECS_PAC"] is not None :
+            entity = FrisquetWaterHeater(entry,coordinator.my_api,"MODE_ECS_PAC")##.data[site]
+            async_add_entities([entity],update_before_add=False)
 
 async def async_add_listener():
         _LOGGER.debug("water heater add_listener")
@@ -38,7 +44,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
         #try:
-        self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS)
+        self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS,self.idx)
         _LOGGER.debug("In watter heater.py async update water heater")
         #except:
         #    _LOGGER.debug("In watter heater.py async update failed")
@@ -53,8 +59,12 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         self.site = site
         self._attr_name = "Chauffe-eau " + self.site
         self._attr_unique_id = "WH"+str(coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]) + str(9)
-        self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
-        self.current_operation =  self.FrisquetToOperation(coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"])
+        self.idx = idx
+        if idx == "MODE_ECS" :
+            self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
+        elif idx == "MODE_ECS_PAC" :
+            self.operation_list = [WaterHeaterModes.ON,WaterHeaterModes.OFFF]
+        self.current_operation =  self.FrisquetToOperation(coordinator.data[self.site]["ecs"][idx]["id"],idx)
         self.temperature_unit = "°C"
         self._attr_supported_features   =  WaterHeaterEntityFeature.OPERATION_MODE
 
@@ -91,22 +101,30 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
             mode = int(4)
         if operation_mode == "Stop":
             mode = int(5)
+        if operation_mode == "On":
+            mode = int(5)
+        if operation_mode == "Off":
+            mode = int(5)
 
         self.current_operation = operation_mode
         FrisquetConnectEntity.id_ECS = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
 
 
-    def FrisquetToOperation(self,idFrisquet):
-        if idFrisquet == 0:
-            return "Max"
-        elif idFrisquet == 1:
-            return "Eco"
-        elif idFrisquet == 2:
-            return "Eco Timer"
-        elif idFrisquet == 3:
-            return "Eco+"
-        elif idFrisquet == 4:
-            return "Eco+ Timer"
-        elif idFrisquet == 5:
-            return "Stop"
+    def FrisquetToOperation(self,idFrisquet,idx):
+        if idx == "MODE_ECS":
+            if idFrisquet == 0:
+                return "Max"
+            elif idFrisquet == 1:
+                return "Eco"
+            elif idFrisquet == 2:
+                return "Eco Timer"
+            elif idFrisquet == 3:
+                return "Eco+"
+            elif idFrisquet == 4:
+                return "Eco+ Timer"
+            elif idFrisquet == 5:
+                return "Stop"
+        elif idx == "MODE_ECS_PAC" :
+            if idFrisquet == 5:
+                return "On"

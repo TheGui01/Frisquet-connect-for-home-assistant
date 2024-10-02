@@ -53,7 +53,7 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
     entitylist=[]
     entity = FrisquetConnectEntity(entry,coordinator.my_api,"zone1",coordinator.my_api.data["nomInstall"])
     entitylist.append(entity)
-    if "zone2"  in coordinator.my_api.data:
+    if "zone2"  in coordinator.my_api.data["nomInstall"]:
         _LOGGER.debug("In Climate.py asyncsetup entry zone2 found creating a 2nd climate")
         entity2 = FrisquetConnectEntity(entry,coordinator.my_api,"zone2",coordinator.my_api.data["nomInstall"])
         entitylist.append(entity2)
@@ -73,36 +73,46 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
         _LOGGER.debug("In Climate.py async update %s",self)
         try:
-            site = self.coordinator.data["nomInstall"]
-            siteID = self.coordinator.data[site]["siteID"]
+
+            site = FrisquetConnectEntity.site #self.coordinator.data["nomInstall"]
+            siteID = self.data[site]["siteID"]
             for siteID in range(len(FrisquetConnectEntity.sites)):
-                self.data[site][self.idx] = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[site][self.idx],self.idx,siteID)
+                site = self.sites[siteID]
+                #self.data[site] = {}
+                #self.data[site][self.idx] = {}
+                siteavailable =""
+                siteavailable = next(iter(self.coordinator.data))
+                tempdict = {}
+                tempdict = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[siteavailable][self.idx],self.idx,siteID)
+                self.data[site][self.idx].update(tempdict)
                 self.data[site]["ecs"] = self.data[site]["ecs"]
         except:
             self.data[self.site][self.idx]["date_derniere_remontee"] = 0
-        if float(self.data[site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
-            if self.data[site]["nomInstall"] == FrisquetConnectEntity.site:
-                _LOGGER.debug("In Climate.py async update in progress %s",self.data[site][self.idx]["token"])
-                self._attr_current_temperature= self.data[site][self.idx]["TAMB"] / 10
-                FrisquetConnectEntity.TAMB[self.idx]= self.data[site][self.idx]["TAMB"] / 10
-                FrisquetConnectEntity.Derogation=self.data[site][self.idx]["DERO"]
-                FrisquetConnectEntity.token = self.data[site][self.idx]["token"]
-                self._attr_preset_mode= self.defPreset(self.data[site][self.idx]["SELECTEUR"], self.data[site][self.idx]["MODE"],self.data[site][self.idx]["ACTIVITE_BOOST"],self.data[site][self.idx]["DERO"] )
-                self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[site][self.idx]["MODE"],self.data[site][self.idx]["DERO"],self._attr_preset_mode,self.data[site][self.idx]["CAMB"] / 10,self.data[site][self.idx]["TAMB"] /10)
-                self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[site][self.idx]["CONS_CONF"] / 10,self.data[site][self.idx]["CONS_RED"] / 10,self.data[site][self.idx]["CONS_HG"] / 10)
+            self.data[site] = {}
+            self.data[site][self.idx] = {}
+        if float(self.data[self.site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
+        #if self.device_info["serial_number"] == FrisquetConnectEntity.IDchaudiere:
+            _LOGGER.debug("In Climate.py async update in progress %s",site)
+            self._attr_current_temperature= self.data[site][self.idx]["TAMB"] / 10
+            FrisquetConnectEntity.TAMB[self.idx]= self.data[site][self.idx]["TAMB"] / 10
+            FrisquetConnectEntity.Derogation=self.data[site][self.idx]["DERO"]
+            FrisquetConnectEntity.token = self.data[site][self.idx]["token"]
+            self._attr_preset_mode= self.defPreset(self.data[site][self.idx]["SELECTEUR"], self.data[site][self.idx]["MODE"],self.data[site][self.idx]["ACTIVITE_BOOST"],self.data[site][self.idx]["DERO"] )
+            self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[site][self.idx]["MODE"],self.data[site][self.idx]["DERO"],self._attr_preset_mode,self.data[site][self.idx]["CAMB"] / 10,self.data[site][self.idx]["TAMB"] /10)
+            self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[site][self.idx]["CONS_CONF"] / 10,self.data[site][self.idx]["CONS_RED"] / 10,self.data[site][self.idx]["CONS_HG"] / 10)
 
-                if self.idx =="zone1":
-                    if self.data[site][self.idx]["T_EXT"] is not None:
-                        FrisquetConnectEntity.T_EXT = self.data[site][self.idx]["T_EXT"] /10
-                    if self.data[site]["ecs"]["MODE_ECS"] is not None:
-                        FrisquetConnectEntity.id_ECS = self.data[site]["ecs"]["MODE_ECS"]["id"]
-                    if "CHF" in self.data[site]["zone1"]["energy"].keys()  :
-                        FrisquetConnectEntity.ConsoCHF = self.data[site][self.idx]["energy"]["CHF"]
-                    if "SAN"  in self.data[site]["zone1"]["energy"].keys()  :
-                        FrisquetConnectEntity.ConsoSAN = self.data[site][self.idx]["energy"]["SAN"]
+            if self.idx =="zone1":
+                if self.data[site][self.idx]["T_EXT"] is not None:
+                    FrisquetConnectEntity.T_EXT = self.data[site][self.idx]["T_EXT"] /10
+                if self.data[site]["ecs"]["MODE_ECS"] is not None:
+                    FrisquetConnectEntity.id_ECS = self.data[site]["ecs"]["MODE_ECS"]["id"]
+                if "CHF" in self.data[site]["zone1"]["energy"].keys()  :
+                    FrisquetConnectEntity.ConsoCHF = self.data[site][self.idx]["energy"]["CHF"]
+                if "SAN"  in self.data[site]["zone1"]["energy"].keys()  :
+                    FrisquetConnectEntity.ConsoSAN = self.data[site][self.idx]["energy"]["SAN"]
         else:
-         _LOGGER.debug("In Climate.py async update No Update")
-         #self.data = FrisquetGetInfo.previousdata
+            _LOGGER.debug("In Climate.py async update No Update")
+            self.data = FrisquetGetInfo.previousdata
         pass
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity ,idx,site) -> None:
@@ -114,15 +124,15 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self.idx = idx
         self.data[site] = {}
         self.data[site][idx] = {}
-        self.data[site].update(coordinator.data[coordinator.data["nomInstall"]])
+        self.data[site].update(coordinator.data[site])#coordinator.data["nomInstall"]])
         FrisquetConnectEntity.site = config_entry.title #coordinator.data["nomInstall"]
         FrisquetConnectEntity.sites = config_entry.data["zone1"]["sites"]
         FrisquetConnectEntity.tz= coordinator.data["timezone"]
         _LOGGER.debug("Init Entity='%s'", self.data[site][idx] )
         self._attr_unique_id = str(self.data[site][idx] ["identifiant_chaudiere"]) + str(self.data[site][idx] ["numero"])
         self._attr_supported_features   = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
-        self._attr_has_entity_name = True
-        self._attr_name = self.data[site][idx] ["nom"]
+        self._attr_has_entity_name = False
+        self._attr_name = self.data[site][idx]["nom"]
         self._attr_temperature_unit= "°C"
         self._attr_target_temperature_low = 5
         self._attr_target_temperature_high = 25
@@ -165,9 +175,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.data[FrisquetConnectEntity.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
-            name=self.coordinator.data["nomInstall"],#self.name
+            name=self.data[self.site][self.idx]["nom"],
             manufacturer="Frisquet",
             model= self.data[self.site][self.idx]["produit"],
             serial_number=self.data[self.site][self.idx]["identifiant_chaudiere"],
