@@ -92,7 +92,8 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             self.data[site][self.idx] = {}
         if float(self.data[self.site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
         #if self.device_info["serial_number"] == FrisquetConnectEntity.IDchaudiere:
-            _LOGGER.debug("In Climate.py async update in progress %s",site)
+            _LOGGER.debug("In Climate.py async update in progress %s",FrisquetConnectEntity.site)
+            site = FrisquetConnectEntity.site
             self._attr_current_temperature= self.data[site][self.idx]["TAMB"] / 10
             FrisquetConnectEntity.TAMB[self.idx]= self.data[site][self.idx]["TAMB"] / 10
             FrisquetConnectEntity.Derogation=self.data[site][self.idx]["DERO"]
@@ -112,7 +113,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                     FrisquetConnectEntity.ConsoSAN = self.data[site][self.idx]["energy"]["SAN"]
         else:
             _LOGGER.debug("In Climate.py async update No Update")
-            self.data = FrisquetGetInfo.previousdata
+           #self.data = FrisquetGetInfo.previousdata
         pass
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity ,idx,site) -> None:

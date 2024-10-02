@@ -44,8 +44,9 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
         #try:
-        self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS,self.idx)
-        _LOGGER.debug("In watter heater.py async update water heater")
+        if self.unique_id == FrisquetConnectEntity.IDchaudiere :
+            self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS,self.idx)
+            _LOGGER.debug("In watter heater.py async update water heater site%s'",FrisquetConnectEntity.site )
         #except:
         #    _LOGGER.debug("In watter heater.py async update failed")
          #   pass
