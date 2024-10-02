@@ -76,21 +76,20 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
             site = FrisquetConnectEntity.site #self.coordinator.data["nomInstall"]
             siteID = self.data[site]["siteID"]
-            for siteID in range(len(FrisquetConnectEntity.sites)):
-                site = self.sites[siteID]
-                #self.data[site] = {}
-                #self.data[site][self.idx] = {}
-                siteavailable =""
-                siteavailable = next(iter(self.coordinator.data))
-                tempdict = {}
-                tempdict = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[siteavailable][self.idx],self.idx,siteID)
-                self.data[site][self.idx].update(tempdict)
-                self.data[site]["ecs"] = self.data[site]["ecs"]
+            #for siteID in range(len(FrisquetConnectEntity.sites)):
+                #site = self.sites[siteID]
+                #siteavailable =""
+                #siteavailable = next(iter(self.coordinator.data))
+                #tempdict = {}
+                #tempdict = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[siteavailable][self.idx],self.idx,siteID)
+                #self.data[site][self.idx].update(tempdict)
+            self.data[site][self.idx]= await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[site][self.idx],self.idx,siteID)
+            self.data[site]["ecs"] = self.data[site]["ecs"]
         except:
-            self.data[self.site][self.idx]["date_derniere_remontee"] = 0
-            self.data[site] = {}
-            self.data[site][self.idx] = {}
-        if float(self.data[self.site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
+            self.data[site][self.idx]["date_derniere_remontee"] = 0
+            #self.data[site] = {}
+            #self.data[site][self.idx] = {}
+        if float(self.data[site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
         #if self.device_info["serial_number"] == FrisquetConnectEntity.IDchaudiere:
             _LOGGER.debug("In Climate.py async update in progress %s",FrisquetConnectEntity.site)
             site = FrisquetConnectEntity.site
