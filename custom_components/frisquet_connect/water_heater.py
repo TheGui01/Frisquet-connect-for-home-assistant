@@ -23,9 +23,8 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
 
     coordinator = MyCoordinator(hass, my_api)
     site = coordinator.my_api.data["nomInstall"]
-    ##coordinator["site"] = site
 
-    #if "ecs"  in coordinator.my_api.data[site] and "MODE_ECS" in coordinator.my_api.data[site]["ecs"]  :
+
     if "ecs"  in coordinator.my_api.data[site] :
         if coordinator.my_api.data[site]["ecs"]["TYPE_ECS"] is not None :
             entity = FrisquetWaterHeater(entry,coordinator.my_api,"MODE_ECS")##.data[site]
@@ -42,14 +41,9 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
-        _LOGGER.debug("In sensor.py async update %s",self)
-        #try:
-        if self.unique_id == "WH"+FrisquetWaterHeater.IDChaudiere + str(9) :
-            self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS,self.idx)
-            _LOGGER.debug("In watter heater.py async update water heater site%s'",FrisquetConnectEntity.site )
-        #except:
-        #    _LOGGER.debug("In watter heater.py async update failed")
-         #   pass
+        _LOGGER.debug("In sensor.py async update water heater site: %s mode: %s",self.site,self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["nom"])
+        self.current_operation = self.FrisquetToOperation(self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"],self.idx)
+
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:

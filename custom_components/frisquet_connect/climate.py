@@ -101,15 +101,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[site][self.idx]["MODE"],self.data[site][self.idx]["DERO"],self._attr_preset_mode,self.data[site][self.idx]["CAMB"] / 10,self.data[site][self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[site][self.idx]["CONS_CONF"] / 10,self.data[site][self.idx]["CONS_RED"] / 10,self.data[site][self.idx]["CONS_HG"] / 10)
 
-            if self.idx =="zone1":
-                if self.data[site][self.idx]["T_EXT"] is not None:
-                    FrisquetConnectEntity.T_EXT = self.data[site][self.idx]["T_EXT"] /10
-                if self.data[site]["ecs"]["MODE_ECS"] is not None:
-                    FrisquetConnectEntity.id_ECS = self.data[site]["ecs"]["MODE_ECS"]["id"]
-                if "CHF" in self.data[site]["zone1"]["energy"].keys()  :
-                    FrisquetConnectEntity.ConsoCHF = self.data[site][self.idx]["energy"]["CHF"]
-                if "SAN"  in self.data[site]["zone1"]["energy"].keys()  :
-                    FrisquetConnectEntity.ConsoSAN = self.data[site][self.idx]["energy"]["SAN"]
+
         else:
             _LOGGER.debug("In Climate.py async update No Update")
            #self.data = FrisquetGetInfo.previousdata
@@ -132,7 +124,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self._attr_unique_id = str(self.data[site][idx] ["identifiant_chaudiere"]) + str(self.data[site][idx] ["numero"])
         self._attr_supported_features   = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
         self._attr_has_entity_name = False
-        self._attr_name = self.data[site][idx]["nom"]
+        self._attr_name = self.data[site][idx]["nom"] #+ " " + idx
         self._attr_temperature_unit= "°C"
         self._attr_target_temperature_low = 5
         self._attr_target_temperature_high = 25
@@ -145,28 +137,19 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         FrisquetConnectEntity.token = self.data[site][idx] ["token"]
         FrisquetConnectEntity.Devicename=self.data[site][idx] ["produit"]
 
-        if self.data[site]["ecs"]["MODE_ECS"] is not  None :
-            FrisquetConnectEntity.id_ECS = self.data[site]["ecs"]["MODE_ECS"]["id"]
+
         FrisquetConnectEntity.Mode = self.data[site][idx] ["MODE"]
         FrisquetConnectEntity.Selecteur=self.data[site][idx] ["SELECTEUR"] # 5 Auto, 6 Permanent
         FrisquetConnectEntity.Derogation=self.data[site][idx] ["DERO"]
         FrisquetConnectEntity.TimeLastOrder = time.time()
         self._attr_current_temperature= self.data[site][idx] ["TAMB"] / 10
-        FrisquetConnectEntity.TAMB : dict ={}
-        FrisquetConnectEntity.TAMB[idx]= self.data[site][idx] ["TAMB"] / 10
+
         self._attr_preset_mode= self.defPreset(FrisquetConnectEntity.Selecteur, FrisquetConnectEntity.Mode,self.data[site][idx] ["ACTIVITE_BOOST"],FrisquetConnectEntity.Derogation )
         _LOGGER.debug("Init climate  preset: %s",self._attr_preset_mode)
         self._attr_hvac_mode =  self.modeFrisquetToHVAC(FrisquetConnectEntity.Mode,FrisquetConnectEntity.Derogation,self._attr_preset_mode,self.data[site][idx] ["CAMB"] / 10,self.data[site][idx] ["TAMB"] /10)
         _LOGGER.debug("Init climate  hvac_mode: %s",self._attr_hvac_mode)
         self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[site][idx] ["CONS_CONF"] / 10,self.data[site][idx] ["CONS_RED"] / 10,self.data[site][idx] ["CONS_HG"] / 10)
-        if self.data[site][idx] ["T_EXT"] is not None:
-                FrisquetConnectEntity.T_EXT = self.data[site][idx] ["T_EXT"] / 10
-        if "CHF" in self.data[site]["zone1"]["energy"].keys() and idx== "zone1" :
-                FrisquetConnectEntity.ConsoCHF = self.data[site][idx] ["energy"]["CHF"]
-        if "SAN" in self.data[site]["zone1"]["energy"].keys() and idx== "zone1" :
-                FrisquetConnectEntity.ConsoSAN = self.data[site][idx] ["energy"]["SAN"]
-        #if idx == 'zone1':
-        #    FrisquetConnectEntity.Conso = self.data[site][idx] ["energy"]
+
 
 
     @property
