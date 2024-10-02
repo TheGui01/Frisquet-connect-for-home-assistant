@@ -59,7 +59,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         site = config_entry.title
         self.site = site
         self._attr_name = "Chauffe-eau " + self.site
-        FrisquetWaterHeater.IDChaudiere = str(coordinator.data[self.site]["zone1"]["identifiant_chaudiere"])
+        FrisquetWaterHeater.IDChaudiere =coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]
         self._attr_unique_id = "WH"+FrisquetWaterHeater.IDChaudiere + str(9)
         self.idx = idx
         if idx == "MODE_ECS" :

@@ -67,7 +67,7 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
         self.idx = idx
         site = config_entry.title
         self.site = site
-        ConsoSAN.IDChaudiere = str(coordinator.data[site][idx]["identifiant_chaudiere"])
+        ConsoSAN.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
         self._attr_unique_id = "SAN"+ConsoSAN.IDChaudiere + str(9)
         self._attr_name = "Consommation Eau Chaude"
 
@@ -128,7 +128,7 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
         self.idx = idx
         site = config_entry.title
         self.site = site
-        ConsoCHF.IDChaudiere = str(coordinator.data[site][idx]["identifiant_chaudiere"])
+        ConsoCHF.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
         self._attr_unique_id = "CHF"+ConsoCHF.IDChaudiere + str(9)
         self._attr_name = "Consommation Chauffage"
         self._attr_has_entity_name = True
@@ -189,7 +189,7 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
         site = config_entry.title
         FrisquetThermometerExt.site = site
         self.site = site
-        FrisquetThermometerExt.IDChaudiere =  str(coordinator.data[site][idx]["identifiant_chaudiere"])
+        FrisquetThermometerExt.IDChaudiere =  coordinator.data[site][idx]["identifiant_chaudiere"]
         self._attr_unique_id = "T"+FrisquetThermometerExt.IDChaudiere + str(9)
 
         self._attr_name = "Temperature extérieure"
@@ -255,7 +255,7 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
         site = config_entry.title
         FrisquetThermometer.site = site#coordinator.data["nomInstall"]
         self.site = site
-        FrisquetThermometer.IDchaudiere = str(coordinator.data[site][idx]["identifiant_chaudiere"])
+        FrisquetThermometer.IDchaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
         self._attr_unique_id = "T"+FrisquetThermometer.IDchaudiere + str(coordinator.data[site][idx]["numero"])
         self._attr_name = "Temperature " +coordinator.data[site][idx]["nom"]
         self._attr_native_value =  coordinator.data[site][idx]["TAMB"]/10
