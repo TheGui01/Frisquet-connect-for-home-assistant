@@ -44,7 +44,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     async def async_update(self):
         _LOGGER.debug("In sensor.py async update %s",self)
         #try:
-        if self.unique_id == FrisquetConnectEntity.IDchaudiere :
+        if self.unique_id == "WH"+FrisquetWaterHeater.IDChaudiere + str(9) :
             self.current_operation = self.FrisquetToOperation(FrisquetConnectEntity.id_ECS,self.idx)
             _LOGGER.debug("In watter heater.py async update water heater site%s'",FrisquetConnectEntity.site )
         #except:
@@ -59,7 +59,8 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         site = config_entry.title
         self.site = site
         self._attr_name = "Chauffe-eau " + self.site
-        self._attr_unique_id = "WH"+str(coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]) + str(9)
+        FrisquetWaterHeater.IDChaudiere = str(coordinator.data[self.site]["zone1"]["identifiant_chaudiere"])
+        self._attr_unique_id = "WH"+FrisquetWaterHeater.IDChaudiere + str(9)
         self.idx = idx
         if idx == "MODE_ECS" :
             self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
