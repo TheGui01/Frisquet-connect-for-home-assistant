@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_platform import (
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,)
-from .climate import MyCoordinator
+from .climate import MyCoordinator,FrisquetConnectEntity
 from homeassistant.const import UnitOfEnergy
 from .const import DOMAIN
 
@@ -54,6 +54,7 @@ async def async_setup_entry( hass: HomeAssistant, entry: ConfigEntry, async_add_
 class ConsoSAN(SensorEntity,CoordinatorEntity):
     data: dict = {}
     async def async_update(self):
+        self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py async update SAN %s",self)
         self._attr_native_value = self.coordinator.data[self.site][self.idx]["energy"]["SAN"]
 
@@ -113,6 +114,7 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
 class ConsoCHF(SensorEntity,CoordinatorEntity):
     data: dict = {}
     async def async_update(self):
+        self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py CHF async update %s",self)
         if self.unique_id == "CHF"+ConsoCHF.IDChaudiere + str(9) :
             self._attr_native_value =  self.coordinator.data[self.site][self.idx]["energy"]["CHF"]
@@ -173,6 +175,7 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
+        self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py async update T_ext %s with temp: %s",self.site, self.coordinator.data[self.site][self.idx]["T_EXT"] /10)
         self._attr_native_value = self.coordinator.data[self.site][self.idx]["T_EXT"] /10
 
@@ -236,6 +239,7 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
     data: dict = {}
     _hass: HomeAssistant
     async def async_update(self):
+        self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py async update %s with temp: %s",self.site, self.coordinator.data[self.site][self.idx]["TAMB"] /10)
         self._attr_native_value = self.coordinator.data[self.site][self.idx]["TAMB"] /10
 

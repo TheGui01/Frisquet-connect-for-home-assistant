@@ -59,7 +59,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         if idx == "MODE_ECS" :
             self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
         elif idx == "MODE_ECS_PAC" :
-            self.operation_list = [WaterHeaterModes.ON,WaterHeaterModes.OFFF]
+            self.operation_list = [WaterHeaterModes.ON,WaterHeaterModes.OFF]
         self.current_operation =  self.FrisquetToOperation(coordinator.data[self.site]["ecs"][idx]["id"],idx)
         self.temperature_unit = "°C"
         self._attr_supported_features   =  WaterHeaterEntityFeature.OPERATION_MODE
@@ -100,7 +100,11 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         if operation_mode == "On":
             mode = int(5)
         if operation_mode == "Off":
-            mode = int(5)
+            if self.idx == "MODE_ECS_PAC" :
+                mode = int(0)
+            if self.idx == "MODE_ECS" :
+                mode = int(5)
+
 
         self.current_operation = operation_mode
         FrisquetConnectEntity.id_ECS = mode
@@ -108,7 +112,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
 
 
     def FrisquetToOperation(self,idFrisquet,idx):
-        if idx == "MODE_ECS":
+        if self.idx == "MODE_ECS":
             if idFrisquet == 0:
                 return "Max"
             elif idFrisquet == 1:
@@ -121,6 +125,8 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
                 return "Eco+ Timer"
             elif idFrisquet == 5:
                 return "Stop"
-        elif idx == "MODE_ECS_PAC" :
+        elif self.idx == "MODE_ECS_PAC" :
             if idFrisquet == 5:
                 return "On"
+            if idFrisquet == 0:
+                return "Stop"
