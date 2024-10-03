@@ -85,6 +85,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
                 #self.data[site][self.idx].update(tempdict)
             self.data[site][self.idx]= await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[site][self.idx],self.idx,siteID)
             self.data[site]["ecs"] = self.data[site]["ecs"]
+            _LOGGER.debug("In Climate.py async self.data UPDATED")
         except:
             self.data[site][self.idx]["date_derniere_remontee"] = 0
             #self.data[site] = {}
@@ -94,7 +95,6 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             _LOGGER.debug("In Climate.py async update in progress %s",FrisquetConnectEntity.site)
             site = FrisquetConnectEntity.site
             self._attr_current_temperature= self.data[site][self.idx]["TAMB"] / 10
-            FrisquetConnectEntity.TAMB[self.idx]= self.data[site][self.idx]["TAMB"] / 10
             FrisquetConnectEntity.Derogation=self.data[site][self.idx]["DERO"]
             FrisquetConnectEntity.token = self.data[site][self.idx]["token"]
             self._attr_preset_mode= self.defPreset(self.data[site][self.idx]["SELECTEUR"], self.data[site][self.idx]["MODE"],self.data[site][self.idx]["ACTIVITE_BOOST"],self.data[site][self.idx]["DERO"] )
