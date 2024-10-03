@@ -107,7 +107,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
 
 
         self.current_operation = operation_mode
-        FrisquetConnectEntity.id_ECS = mode
+        self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
 
 
