@@ -41,8 +41,9 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
-        _LOGGER.debug("In sensor.py async update water heater site: %s mode: %s",self.site,self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["nom"])
-        self.current_operation = self.FrisquetToOperation(self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"],self.idx)
+
+        _LOGGER.debug("In sensor.py async update water heater site: %s mode: %s",self.site,self.coordinator.data[self.site]["ecs"][self.idx]["nom"])
+        self.current_operation = self.FrisquetToOperation(self.coordinator.data[self.site]["ecs"][self.idx]["id"],self.idx)
 
 
 
@@ -85,6 +86,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     def should_poll(self) -> bool:
         """Poll for those entities"""
         return True
+
     async  def async_turn_on (self):
         if self.idx == "MODE_ECS_PAC" :
             operation_mode = "On"
@@ -94,7 +96,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
             mode = int(1)
 
         self.current_operation = operation_mode
-        self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
+        #self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
 
     async  def async_turn_off (self):
@@ -104,7 +106,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
             mode = int(5)
         operation_mode = "Stop"
         self.current_operation = operation_mode
-        self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
+        #self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
         pass
 
@@ -121,23 +123,22 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         if operation_mode == "Eco+ Timer":
             mode = int(4)
         if operation_mode == "Stop":
-            mode = int(5)
-        if operation_mode == "On":
-            mode = int(5)
-        if operation_mode == "Off":
             if self.idx == "MODE_ECS_PAC" :
                 mode = int(0)
             if self.idx == "MODE_ECS" :
                 mode = int(5)
+        if operation_mode == "On":
+            mode = int(5)
+
 
 
         self.current_operation = operation_mode
-        self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
+        self.coordinator.data[self.site]["ecs"][self.idx]["id"] = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
 
 
     def FrisquetToOperation(self,idFrisquet,idx):
-        if self.idx == "MODE_ECS":
+        if idx == "MODE_ECS":
             if idFrisquet == 0:
                 return "Max"
             elif idFrisquet == 1:
@@ -150,7 +151,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
                 return "Eco+ Timer"
             elif idFrisquet == 5:
                 return "Stop"
-        elif self.idx == "MODE_ECS_PAC" :
+        elif idx == "MODE_ECS_PAC" :
             if idFrisquet == 5:
                 return "On"
             if idFrisquet == 0:
