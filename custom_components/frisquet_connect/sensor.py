@@ -66,8 +66,8 @@ class ConsoSAN(SensorEntity,CoordinatorEntity):
         self.idx = idx
         site = config_entry.title
         self.site = site
-        ConsoSAN.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
-        self._attr_unique_id = "SAN"+ConsoSAN.IDChaudiere + str(9)
+        self.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
+        self._attr_unique_id = "SAN"+self.IDChaudiere + str(9)
         self._attr_name = "Consommation Eau Chaude"
 
 
@@ -116,7 +116,7 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
     async def async_update(self):
         self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py CHF async update %s",self)
-        if self.unique_id == "CHF"+ConsoCHF.IDChaudiere + str(9) :
+        if self.unique_id == "CHF"+self.IDChaudiere + str(9) :
             self._attr_native_value =  self.coordinator.data[self.site][self.idx]["energy"]["CHF"]
 
 
@@ -127,8 +127,8 @@ class ConsoCHF(SensorEntity,CoordinatorEntity):
         self.idx = idx
         site = config_entry.title
         self.site = site
-        ConsoCHF.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
-        self._attr_unique_id = "CHF"+ConsoCHF.IDChaudiere + str(9)
+        self.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
+        self._attr_unique_id = "CHF"+self.IDChaudiere + str(9)
         self._attr_name = "Consommation Chauffage"
         self._attr_has_entity_name = True
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
@@ -177,7 +177,8 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
     async def async_update(self):
         self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py async update T_ext %s with temp: %s",self.site, self.coordinator.data[self.site][self.idx]["T_EXT"] /10)
-        self._attr_native_value = self.coordinator.data[self.site][self.idx]["T_EXT"] /10
+        if self._attr_unique_id == "T"+self.IDChaudiere + str(9):
+            self._attr_native_value = self.coordinator.data[self.site][self.idx]["T_EXT"] /10
 
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity,idx )-> None:
@@ -186,10 +187,10 @@ class FrisquetThermometerExt(SensorEntity,CoordinatorEntity):
         super().__init__(coordinator)
         self.idx = idx
         site = config_entry.title
-        FrisquetThermometerExt.site = site
         self.site = site
-        FrisquetThermometerExt.IDChaudiere =  coordinator.data[site][idx]["identifiant_chaudiere"]
-        self._attr_unique_id = "T"+FrisquetThermometerExt.IDChaudiere + str(9)
+        self.site = site
+        self.IDChaudiere =  coordinator.data[site][idx]["identifiant_chaudiere"]
+        self._attr_unique_id = "T"+self.IDChaudiere + str(9)
 
         self._attr_name = "Temperature extérieure"
         self._attr_native_value =  coordinator.data[site][idx]["T_EXT"]/10
@@ -241,7 +242,8 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
     async def async_update(self):
         self.coordinator.data = FrisquetConnectEntity.data
         _LOGGER.debug("In sensor.py async update %s with temp: %s",self.site, self.coordinator.data[self.site][self.idx]["TAMB"] /10)
-        self._attr_native_value = self.coordinator.data[self.site][self.idx]["TAMB"] /10
+        if self._attr_unique_id == "T"+ str(self.IDchaudiere) + str(self.numeroZone):
+            self._attr_native_value = self.coordinator.data[self.site][self.idx]["TAMB"] /10
 
 
 
@@ -251,11 +253,11 @@ class FrisquetThermometer(SensorEntity,CoordinatorEntity):
         super().__init__(coordinator)
         self.idx =idx
         site = config_entry.title
-        FrisquetThermometer.site = site#coordinator.data["nomInstall"]
+        self.site = site#coordinator.data["nomInstall"]
         self.site = site
-        FrisquetThermometer.numeroZone = self.coordinator.data[FrisquetThermometer.site][self.idx]["numero"]
-        FrisquetThermometer.IDchaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
-        self._attr_unique_id = "T"+ str(FrisquetThermometer.IDchaudiere) + str(FrisquetThermometer.numeroZone)
+        self.numeroZone = self.coordinator.data[self.site][self.idx]["numero"]
+        self.IDchaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
+        self._attr_unique_id = "T"+ str(self.IDchaudiere) + str(self.numeroZone)
         self._attr_has_entity_name = False
         self._attr_name = "Temperature " +coordinator.data[site][idx]["nom"] #+ " " + idx
         self._attr_native_value =  coordinator.data[site][idx]["TAMB"]/10

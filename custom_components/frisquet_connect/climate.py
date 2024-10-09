@@ -74,38 +74,31 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         _LOGGER.debug("In Climate.py async update %s",self)
         try:
 
-            site = FrisquetConnectEntity.site #self.coordinator.data["nomInstall"]
+            site = self.site #self.coordinator.data["nomInstall"]
             siteID = self.data[site]["siteID"]
-            #for siteID in range(len(FrisquetConnectEntity.sites)):
-                #site = self.sites[siteID]
-                #siteavailable =""
-                #siteavailable = next(iter(self.coordinator.data))
-                #tempdict = {}
-                #tempdict = await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[siteavailable][self.idx],self.idx,siteID)
-                #self.data[site][self.idx].update(tempdict)
             self.data[site][self.idx]= await FrisquetGetInfo.getTokenAndInfo(self,self.coordinator.data[site][self.idx],self.idx,siteID)
             self.data[site]["ecs"] = self.data[site]["ecs"]
             _LOGGER.debug("In Climate.py async self.data UPDATED")
         except:
             self.data[site][self.idx]["date_derniere_remontee"] = 0
-            #self.data[site] = {}
-            #self.data[site][self.idx] = {}
+            _LOGGER.debug("In Climate.py async exception reached")
+
         if float(self.data[site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
-        #if self.device_info["serial_number"] == FrisquetConnectEntity.IDchaudiere:
-            _LOGGER.debug("In Climate.py async update in progress %s",FrisquetConnectEntity.site)
-            site = FrisquetConnectEntity.site
+         if self.device_info["serial_number"] == self.IDchaudiere:
+            _LOGGER.debug("In Climate.py async update in progress %s",self.site)
+            site = self.site
             self._attr_current_temperature= self.data[site][self.idx]["TAMB"] / 10
-            FrisquetConnectEntity.Derogation=self.data[site][self.idx]["DERO"]
-            FrisquetConnectEntity.token = self.data[site][self.idx]["token"]
+            self.Derogation=self.data[site][self.idx]["DERO"]
+            self.token = self.data[site][self.idx]["token"]
             self._attr_preset_mode= self.defPreset(self.data[site][self.idx]["SELECTEUR"], self.data[site][self.idx]["MODE"],self.data[site][self.idx]["ACTIVITE_BOOST"],self.data[site][self.idx]["DERO"] )
-            self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[site][self.idx]["MODE"],self.data[site][self.idx]["DERO"],self._attr_preset_mode,self.data[site][self.idx]["CAMB"] / 10,self.data[site][self.idx]["TAMB"] /10)
+            self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.data[site][self.idx ]["MODE"],self.data[site][self.idx]["DERO"],self._attr_preset_mode,self.data[site][self.idx]["CAMB"] / 10,self.data[site][self.idx]["TAMB"] /10)
             self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[site][self.idx]["CONS_CONF"] / 10,self.data[site][self.idx]["CONS_RED"] / 10,self.data[site][self.idx]["CONS_HG"] / 10)
 
 
         else:
             _LOGGER.debug("In Climate.py async update No Update")
-           #self.data = FrisquetGetInfo.previousdata
-        pass
+
+        #pass
 
     def __init__(self, config_entry: ConfigEntry,coordinator: CoordinatorEntity ,idx,site) -> None:
 
@@ -117,9 +110,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self.data[site] = {}
         self.data[site][idx] = {}
         self.data[site].update(coordinator.data[site])#coordinator.data["nomInstall"]])
-        FrisquetConnectEntity.site = config_entry.title #coordinator.data["nomInstall"]
-        FrisquetConnectEntity.sites = config_entry.data["zone1"]["sites"]
-        FrisquetConnectEntity.tz= coordinator.data["timezone"]
+        self.site = config_entry.title #coordinator.data["nomInstall"]
+        self.sites = config_entry.data["zone1"]["sites"]
+        self.tz= coordinator.data["timezone"]
         _LOGGER.debug("Init Entity='%s'", self.data[site][idx] )
         self._attr_unique_id = str(self.data[site][idx] ["identifiant_chaudiere"]) + str(self.data[site][idx] ["numero"])
         self._attr_supported_features   = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
@@ -132,21 +125,21 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         self._attr_preset_modes = self.DefineavAilablePresetmodes(self.data[site][idx] ["boost_disponible"] )
         self._attr_translation_key = "frisquet_connect"
 
-        FrisquetConnectEntity.IDchaudiere = str(self.data[site][idx] ["identifiant_chaudiere"])
-        FrisquetConnectEntity.zoneNR: str = self.data[site][idx] ["numero"]
-        FrisquetConnectEntity.token = self.data[site][idx] ["token"]
-        FrisquetConnectEntity.Devicename=self.data[site][idx] ["produit"]
+        self.IDchaudiere = str(self.data[site][idx] ["identifiant_chaudiere"])
+        self.zoneNR: str = self.data[site][idx] ["numero"]
+        self.token = self.data[site][idx] ["token"]
+        self.Devicename=self.data[site][idx] ["produit"]
 
 
-        FrisquetConnectEntity.Mode = self.data[site][idx] ["MODE"]
-        FrisquetConnectEntity.Selecteur=self.data[site][idx] ["SELECTEUR"] # 5 Auto, 6 Permanent
-        FrisquetConnectEntity.Derogation=self.data[site][idx] ["DERO"]
-        FrisquetConnectEntity.TimeLastOrder = time.time()
+        self.Mode = self.data[site][idx] ["MODE"]
+        self.Selecteur=self.data[site][idx] ["SELECTEUR"] # 5 Auto, 6 Permanent
+        self.Derogation=self.data[site][idx] ["DERO"]
+        self.TimeLastOrder = time.time()
         self._attr_current_temperature= self.data[site][idx] ["TAMB"] / 10
 
-        self._attr_preset_mode= self.defPreset(FrisquetConnectEntity.Selecteur, FrisquetConnectEntity.Mode,self.data[site][idx] ["ACTIVITE_BOOST"],FrisquetConnectEntity.Derogation )
+        self._attr_preset_mode= self.defPreset(self.Selecteur, self.Mode,self.data[site][idx] ["ACTIVITE_BOOST"],self.Derogation )
         _LOGGER.debug("Init climate  preset: %s",self._attr_preset_mode)
-        self._attr_hvac_mode =  self.modeFrisquetToHVAC(FrisquetConnectEntity.Mode,FrisquetConnectEntity.Derogation,self._attr_preset_mode,self.data[site][idx] ["CAMB"] / 10,self.data[site][idx] ["TAMB"] /10)
+        self._attr_hvac_mode =  self.modeFrisquetToHVAC(self.Mode,self.Derogation,self._attr_preset_mode,self.data[site][idx] ["CAMB"] / 10,self.data[site][idx] ["TAMB"] /10)
         _LOGGER.debug("Init climate  hvac_mode: %s",self._attr_hvac_mode)
         self._attr_target_temperature= self.defConsigneTemp(self._attr_preset_mode,self.data[site][idx] ["CONS_CONF"] / 10,self.data[site][idx] ["CONS_RED"] / 10,self.data[site][idx] ["CONS_HG"] / 10)
 
@@ -158,7 +151,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.data[FrisquetConnectEntity.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
+                (DOMAIN, self.data[self.site][self.idx]["identifiant_chaudiere"])#self.unique_id)
             },
             name=self.data[self.site][self.idx]["nom"],
             manufacturer="Frisquet",
@@ -331,7 +324,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
 
     def getPresetFromProgramation(self):
 
-        desired_timezone = pytz.timezone(FrisquetConnectEntity.tz)
+        desired_timezone = pytz.timezone(self.tz)
         maintenant = datetime.now(desired_timezone)
         jour :int = maintenant.weekday() +1
         if jour == 7:  jour = 0
@@ -356,9 +349,9 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
         else:
             idx=self.idx
         _session = aiohttp.ClientSession(headers="")
-        _IDChaudiere = FrisquetConnectEntity.IDchaudiere
+        _IDChaudiere = self.IDchaudiere
         _LOGGER.debug("In OrderToFrisquestAPI IDChaudiere :'%s",_IDChaudiere)
-        _url =ORDER_API+_IDChaudiere+"?token="+FrisquetConnectEntity.token
+        _url =ORDER_API+_IDChaudiere+"?token="+self.token
         _LOGGER.debug("In OrderToFrisquestAPI with url :'%s",_url)
         headers = {
                         'Host':'fcutappli.frisquet.com',
@@ -379,7 +372,7 @@ class FrisquetConnectEntity(ClimateEntity,CoordinatorEntity):
             json_data = await resp.json()
             _LOGGER.debug("In OrderToFrisquestAPI resp :'%s",json_data)
             await _session.close()
-            FrisquetConnectEntity.TimeLastOrder = time.time()
+            self.TimeLastOrder = time.time()
             #time.sleep(2)
 
 class MyCoordinator(DataUpdateCoordinator):

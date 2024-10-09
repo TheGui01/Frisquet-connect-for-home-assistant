@@ -53,14 +53,15 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         site = config_entry.title
         self.site = site
         self._attr_name = "Chauffe-eau " + self.site
-        FrisquetWaterHeater.IDChaudiere =coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]
-        self._attr_unique_id = "WH"+FrisquetWaterHeater.IDChaudiere + str(9)
+        self.IDChaudiere =coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]
+        self._attr_unique_id = "WH"+self.IDChaudiere + str(9)
         self.idx = idx
         if idx == "MODE_ECS" :
             self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
         elif idx == "MODE_ECS_PAC" :
             self.operation_list = [WaterHeaterModes.ON,WaterHeaterModes.OFF]
         self.current_operation =  self.FrisquetToOperation(coordinator.data[self.site]["ecs"][idx]["id"],idx)
+
         self.temperature_unit = "°C"
         self._attr_supported_features   =  WaterHeaterEntityFeature.OPERATION_MODE
 
@@ -83,6 +84,29 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
     def should_poll(self) -> bool:
         """Poll for those entities"""
         return True
+    async  def async_turn_on (self):
+        if self.idx == "MODE_ECS_PAC" :
+            operation_mode = "On"
+            mode = int(5)
+        else:
+            operation_mode = "Eco"
+            mode = int(1)
+
+        self.current_operation = operation_mode
+        self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
+        await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
+
+    async  def async_turn_off (self):
+        if self.idx == "MODE_ECS_PAC" :
+            mode = int(0)
+        elif self.idx == "MODE_ECS" :
+            mode = int(5)
+        operation_mode = "Off"
+        self.current_operation = operation_mode
+        self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
+        await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
+        pass
+
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
         if operation_mode == "Max":
