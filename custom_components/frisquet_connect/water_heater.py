@@ -53,8 +53,9 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
         site = config_entry.title
         self.site = site
         self._attr_name = "Chauffe-eau " + self.site
-        self.IDChaudiere =coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]
-        self._attr_unique_id = "WH"+self.IDChaudiere + str(9)
+        self.IDchaudiere =coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]
+        self.token = coordinator.data[self.site]["zone1"]["token"]
+        self._attr_unique_id = "WH"+self.IDchaudiere + str(9)
         self.idx = idx
         if idx == "MODE_ECS" :
             self.operation_list = [WaterHeaterModes.MAX,WaterHeaterModes.ECO,WaterHeaterModes.ECOT,WaterHeaterModes.ECOP,WaterHeaterModes.ECOPT,WaterHeaterModes.OFF]
