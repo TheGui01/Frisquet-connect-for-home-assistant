@@ -1,15 +1,34 @@
-# Frisquet-connect-for-home-assistant
-This repository contains the Frisquet API that can be integrated in Home Assistant.
+[![HACS Custom][hacs_shield]][hacs]
+[![GitHub release](https://img.shields.io/github/release/TheGui01/Frisquet-connect-for-home-assistant?include_prereleases=&sort=semver&color=blue)](https://github.com/TheGui01/Frisquet-connect-for-home-assistant/releases/)
+
+
+
+[hacs_shield]: https://img.shields.io/static/v1.svg?label=HACS&message=Custom&style=popout&color=orange&labelColor=41bdf5&logo=HomeAssistantCommunityStore&logoColor=white
+[hacs]: https://hacs.xyz/docs/faq/custom_repositories
+[releases_shield]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2TheGui01%2FFrisquet-connect-for-home-assistant%2Fmain%2Fcustom_components%2Ffrisquet_connect%2Fmanifest.json&query=%24.version&label=relea
+
+
+# Frisquet Connect For Home Assistant
+
 ![Screenshot](FrisquetDeviceSample.png)
 ![Screenshot](FrisquetDeviceSample2.png)
 
 ## Installation
 
-#### HACS
+### HACS
 
-Add this repo (https://github.com/TheGui01/Frisquet-connect-for-home-assistant) to the HACS store and install from there.
+Frisquet connect is available in HACS (Home Assistant Community Store).
 
-#### local install
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thegui01&repository=Frisquet-connect-for-home-assistant)
+
+_or_
+
+1. Install HACS if you don't have it already
+2. Open HACS in Home Assistant
+3. Search for "Frisquet"
+4. Click the download button. ⬇️
+
+### local install
 
 1- Copy the folder frisquet_connect into your custom_components folder<br>
 2- Restart HA and add the integration Frisquet connect from Device -> Add integration<br>

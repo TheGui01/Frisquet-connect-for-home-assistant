@@ -17,7 +17,16 @@
 
 ### HACS
 
-Add this repo (https://github.com/TheGui01/Frisquet-connect-for-home-assistant) to the HACS store and install from there.
+Frisquet connect is available in HACS (Home Assistant Community Store).
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thegui01&repository=Frisquet-connect-for-home-assistant)
+
+_or_
+
+1. Install HACS if you don't have it already
+2. Open HACS in Home Assistant
+3. Search for "Frisquet"
+4. Click the download button. ⬇️
 
 ### local install
 
