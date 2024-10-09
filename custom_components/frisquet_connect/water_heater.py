@@ -101,7 +101,7 @@ class FrisquetWaterHeater(WaterHeaterEntity,CoordinatorEntity):
             mode = int(0)
         elif self.idx == "MODE_ECS" :
             mode = int(5)
-        operation_mode = "Off"
+        operation_mode = "Stop"
         self.current_operation = operation_mode
         self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self,"MODE_ECS",mode)
