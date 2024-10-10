@@ -12,6 +12,15 @@
         "require_admin": false,
         "mode": "storage",
         "url_path": "dashboard-test"
+      },
+      {
+        "id": "dashboard_testr",
+        "show_in_sidebar": true,
+        "icon": "mdi:account",
+        "title": "testr",
+        "require_admin": false,
+        "mode": "storage",
+        "url_path": "dashboard-testr"
       }
     ]
   }

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.dashboard_testr",
+  "data": {
+    "config": {
+      "views": [
+        {
+          "title": "Home",
+          "cards": [
+            {
+              "type": "tile",
+              "entity": "water_heater.chauffe_eau_maison",
+              "features": [
+                {
+                  "type": "water-heater-operation-modes",
+                  "operation_modes": [
+                    "Max",
+                    "Eco",
+                    "Eco Timer",
+                    "Eco+",
+                    "Eco+ Timer",
+                    "Stop"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tile",
+              "entity": "climate.zone_1",
+              "features": [
+                {
+                  "type": "climate-preset-modes",
+                  "style": "dropdown",
+                  "preset_modes": [
+                    "comfort",
+                    "reduit",
+                    "boost",
+                    "hors_gel",
+                    "reduit_permanent",
+                    "confort_permanent"
+                  ]
+                },
+                {
+                  "type": "climate-hvac-modes",
+                  "hvac_modes": [
+                    "heat",
+                    "auto",
+                    "off"
+                  ]
+                },
+                {
+                  "type": "target-temperature"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
