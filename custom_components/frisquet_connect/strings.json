@@ -36,23 +36,6 @@
                     }
                 }
             }
-        },
-        "water_heater": {
-            "frisquet_connect": {
-                "state_attributes": {
-                    "preoperation_mode": {
-                        "state": {
-                            "Max": "Max",
-                            "Eco": "Eco",
-                            "Eco Timer": "Eco Timer",
-                            "Eco+": "Eco+",
-                            "Eco+ Timer": "Eco+ Timer",
-                            "On": "On",
-                            "Stop": "Stop"
-                        }
-                    }
-                }
-            }
         }
     }
 }
