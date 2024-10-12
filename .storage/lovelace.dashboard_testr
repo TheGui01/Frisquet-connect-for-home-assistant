@@ -15,12 +15,12 @@
                 {
                   "type": "water-heater-operation-modes",
                   "operation_modes": [
-                    "Max",
-                    "Eco",
-                    "Eco Timer",
-                    "Eco+",
-                    "Eco+ Timer",
-                    "Stop"
+                    "max",
+                    "eco",
+                    "eco_timer",
+                    "ecop",
+                    "ecop_Timer",
+                    "stop"
                   ]
                 }
               ]

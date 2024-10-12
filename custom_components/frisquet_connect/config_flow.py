@@ -33,37 +33,39 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
 
-        FrisquetConfigFlow.data.update(user_input)
+        self.data.update(user_input)
         sites = []
-        sites = await FrisquetGetInfo.getSite(self,FrisquetConfigFlow.data)
-        FrisquetConfigFlow.data["sites"] = sites
+        sites = await FrisquetGetInfo.getSite(self,self.data)
+        self.data["email"] = user_input["email"]
+        self.data["password"] = user_input["password"]
+        self.data["sites"] = sites
         return await self.async_step_2()
 
     async def async_step_2(self,user_input : dict | None = None  ) :
-            if len(FrisquetConfigFlow.data["sites"])>1:
+            if len(self.data["sites"])>1:
                 if user_input is  None:
                     return self.async_show_form(step_id="2", data_schema=vol.Schema(
                     {
-                        vol.Required("site",default=0): vol.In(FrisquetConfigFlow.data["sites"]),
+                        vol.Required("site",default=0): vol.In(self.data["sites"]),
                     }
                     ),
                     )
-                FrisquetConfigFlow.data.update(user_input)
+                self.data.update(user_input)
 
-                site = FrisquetConfigFlow.data["sites"].index(user_input["site"])
+                site = self.data["sites"].index(user_input["site"])
 
             else:
                  site = 0#FrisquetConfigFlow.data["sites"][0]
 
             self.datadict = []
-            for i in range(len(FrisquetConfigFlow.data["sites"])):
+            for i in range(len(self.data["sites"])):
                 self.datadict.append("")
 
-            FrisquetConfigFlow.data[site] = await FrisquetGetInfo.getTokenAndInfo(self,FrisquetConfigFlow.data,0,site)
-            _LOGGER.debug("Config_Flow data=%s", FrisquetConfigFlow.data)
+            self.data[site] = await FrisquetGetInfo.getTokenAndInfo(self,self.data,0,site)
+            _LOGGER.debug("Config_Flow data=%s", self.data)
 
-            self.datadict[site] = FrisquetConfigFlow.data[site]
-            self.datadict[site]["nomInstall"] = FrisquetConfigFlow.data["sites"][site]
+            self.datadict[site] = self.data[site]
+            self.datadict[site]["nomInstall"] = self.data["sites"][site]
             self.datadict[site]["SiteID"] = site
 
 

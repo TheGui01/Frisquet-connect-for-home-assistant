@@ -82,7 +82,7 @@ class FrisquetGetInfo:
 
 
                       _LOGGER.debug("In getToken and info Frisquet API, site : %s",site)
-                    #_LOGGER.debug("In getToken and info json data 2 '%s'" ,self.json_data)
+
 
                       #if site == 0:  # To test Site 2
                       _url = API_URL+ json_data["utilisateur"]["sites"][site]["identifiant_chaudiere"]+"?token="+json_data["token"]
@@ -91,13 +91,16 @@ class FrisquetGetInfo:
                       await _session.close()
 
                       _session = aiohttp.ClientSession(headers="")
-                      _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
+                      #_LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url)
 
                       async with await _session.get(url=_url) as resp:
                             #if idx == 0:   ##if else to test no response from server
                         response = await resp.json()
                         await _session.close()
-
+                        reponseAnonimized = response
+                        reponseAnonimized["code_postal"] =""
+                        reponseAnonimized["emails_alerte"]=""
+                        _LOGGER.debug("In getToken and info Frisquet API, response : %s",reponseAnonimized)
                             #to Test zone2
                             #response["zones"][0] ={'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
                             #response["zones"].append({'boost_disponible': True, 'id': 106521, 'identifiant': 'Z2', 'numero': 2, 'nom': 'Zone 2', 'carac_zone': {'MODE': 6, 'SELECTEUR': 5, 'TAMB': 281, 'CAMB': 205, 'DERO': False, 'CONS_RED': 181, 'CONS_CONF': 206, 'CONS_HG': 86, 'ACTIVITE_BOOST': False}, 'programmation': [{'jour': 0, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 1, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 2, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 3, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 4, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]}, {'jour': 5, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {'jour': 6, 'plages': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}]})
@@ -155,40 +158,46 @@ class FrisquetGetInfo:
                             await _session.close()
                             #if i == 0:
                             #if site == 0: #to test Site 2
-                            _url2 = API_URL+ json_data["utilisateur"]["sites"][site]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
+                            try:
+                              _url2 = API_URL+ json_data["utilisateur"]["sites"][site]["identifiant_chaudiere"]+"/conso?token="+json_data["token"]+"&types[]=CHF&types[]=SAN"
 
-                            _session2 = aiohttp.ClientSession(headers="")
-                            _LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url2)
+                              _session2 = aiohttp.ClientSession(headers="")
+                              #_LOGGER.debug("In PoolFrisquestAPI with url :'%s",_url2)
 
-                            #if site == 0:  # To test Site 2
-                            async with await _session2.get(url=_url2) as resp2:
-                                response2 = await resp2.json()
-                            _LOGGER.debug("response API energy :'%s",response2)
-                            #else :# To test Site 2
-                            #  response2 = {'CHF': [{'valeur': 64, 'mois': 11, 'annee': '2023'}, {'valeur': 66, 'mois': 12, 'annee': '2023'}, {'valeur': 3, 'mois': 1, 'annee': '2024'}, {'valeur': 915, 'mois': 2, 'annee': '2024'}, {'valeur': 922, 'mois': 3, 'annee': '2024'}, {'valeur': 630, 'mois': 4, 'annee': '2024'}, {'valeur': 122, 'mois': 5, 'annee': '2024'}, {'valeur': 0, 'mois': 6, 'annee': '2024'}, {'valeur': 0, 'mois': 7, 'annee': '2024'}, {'valeur': 0, 'mois': 8, 'annee': '2024'}], 'SAN': [{'valeur': 8, 'mois': 11, 'annee': '2023'}, {'valeur': 217, 'mois': 12, 'annee': '2023'}, {'valeur': 79, 'mois': 1, 'annee': '2024'}, {'valeur': 207, 'mois': 2, 'annee': '2024'}, {'valeur': 235, 'mois': 3, 'annee': '2024'}, {'valeur': 209, 'mois': 4, 'annee': '2024'}, {'valeur': 9, 'mois': 5, 'annee': '2024'}, {'valeur': 5, 'mois': 6, 'annee': '2024'}, {'valeur': 7, 'mois': 7, 'annee': '2024'}, {'valeur': 9, 'mois': 8, 'annee': '2024'}], 'max': 5000}
-                            j=0
-                            consoCHF = 0
-                            consoSAN = 0
-                            for j in range(len(response2["CHF"])):
-                              consoCHF = consoCHF + response2["CHF"][j]["valeur"]
-                              if response2["SAN"] is not None:
-                                  consoSAN = consoSAN + response2["SAN"][j]["valeur"]
-
-                            self.data[data["sites"][site]]["zone1"]["energy"] = {}
-                            self.data[data["sites"][site]]["zone1"]["energy"]["CHF"] = consoCHF
-                            if response2["SAN"] is not None:
-                              self.data[data["sites"][site]]["zone1"]["energy"]["SAN"] = consoSAN
-
-                            #if site == 0:  # To test Site 2
+                              #if site == 0:  # To test Site 2
+                              async with await _session2.get(url=_url2) as resp2:
+                                  response2 = await resp2.json()
                               await _session2.close()
+                              _LOGGER.debug("response API energy :'%s",response2)
+                              #else :# To test Site 2
+                              #  response2 = {'CHF': [{'valeur': 64, 'mois': 11, 'annee': '2023'}, {'valeur': 66, 'mois': 12, 'annee': '2023'}, {'valeur': 3, 'mois': 1, 'annee': '2024'}, {'valeur': 915, 'mois': 2, 'annee': '2024'}, {'valeur': 922, 'mois': 3, 'annee': '2024'}, {'valeur': 630, 'mois': 4, 'annee': '2024'}, {'valeur': 122, 'mois': 5, 'annee': '2024'}, {'valeur': 0, 'mois': 6, 'annee': '2024'}, {'valeur': 0, 'mois': 7, 'annee': '2024'}, {'valeur': 0, 'mois': 8, 'annee': '2024'}], 'SAN': [{'valeur': 8, 'mois': 11, 'annee': '2023'}, {'valeur': 217, 'mois': 12, 'annee': '2023'}, {'valeur': 79, 'mois': 1, 'annee': '2024'}, {'valeur': 207, 'mois': 2, 'annee': '2024'}, {'valeur': 235, 'mois': 3, 'annee': '2024'}, {'valeur': 209, 'mois': 4, 'annee': '2024'}, {'valeur': 9, 'mois': 5, 'annee': '2024'}, {'valeur': 5, 'mois': 6, 'annee': '2024'}, {'valeur': 7, 'mois': 7, 'annee': '2024'}, {'valeur': 9, 'mois': 8, 'annee': '2024'}], 'max': 5000}
+                              j=0
+                              consoCHF = 0
+                              consoSAN = 0
+                              for j in range(len(response2["CHF"])):
+                                consoCHF = consoCHF + response2["CHF"][j]["valeur"]
+                                if response2["SAN"] is not None:
+                                    consoSAN = consoSAN + response2["SAN"][j]["valeur"]
+
+                              self.data[data["sites"][site]]["zone1"]["energy"] = {}
+                              self.data[data["sites"][site]]["zone1"]["energy"]["CHF"] = consoCHF
+                              if response2["SAN"] is not None:
+                                self.data[data["sites"][site]]["zone1"]["energy"]["SAN"] = consoSAN
+
+                              #if site == 0:  # To test Site 2
+
+
+
+                            except:
+                                await _session.close()
+                                _LOGGER.debug("In PoolFrisquestAPI Error exception reached no Energy" )
 
                             if idx == 0:
-                              _LOGGER.debug("In PoolFrisquestAPI data idx==0  :'%s",self.data)
+                              #_LOGGER.debug("In PoolFrisquestAPI data idx==0  :'%s",self.data)
                               return self.data[data["sites"][site]]
                             else:
-                              _LOGGER.debug("In PoolFrisquestAPI data idx!=0  :'%s",self.data)
+                              #_LOGGER.debug("In PoolFrisquestAPI data idx!=0  :'%s",self.data)
                               return self.data[data["sites"][site]][idx]
-
 
                       else:
                         _LOGGER.debug("In PoolFrisquestAPI No zones found in responses :'%s",self.previousdata)
@@ -199,8 +208,8 @@ class FrisquetGetInfo:
 
                     except:
                       await _session.close()
-                      _LOGGER.debug("In PoolFrisquestAPI No zones found in responses :'%s",self.data[data["sites"][site]][idx])
+                     # _LOGGER.debug("In PoolFrisquestAPI No zones found in responses :'%s",self.data[data["sites"][site]][idx])
                       self.data[data["sites"][site]][idx] = {}
                       self.data[data["sites"][site]][idx].update({"date_derniere_remontee": 0})
-                      _LOGGER.debug("In PoolFrisquestAPI Error exception :'%s",self.data[data["sites"][site]][idx])
+                      _LOGGER.debug("In PoolFrisquestAPI Error exception reached :'%s",self.data[data["sites"][site]][idx])
                       return self.data[data["sites"][site]][idx]

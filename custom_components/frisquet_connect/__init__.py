@@ -21,12 +21,9 @@ async def async_setup_entry (hass: HomeAssistant, entry: ConfigEntry) -> bool:  
     else:
         SiteID = 0
     data = entry.data
-    await my_api.getTokenAndInfo(data["zone1"],0,SiteID)
-    _LOGGER.debug(
-        "Appel de async_setup_entry entry: entry_id='%s', data='%s",
-        entry.entry_id,
-        entry.data,
-    )
+    firstKeydict = list(data.keys())[0]
+    await my_api.getTokenAndInfo(data[firstKeydict],0,SiteID)
+    #_LOGGER.debug(        "Appel de async_setup_entry entry: entry_id='%s', data='%s",        entry.entry_id,        entry.data,    )
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.unique_id]  = my_api
 
