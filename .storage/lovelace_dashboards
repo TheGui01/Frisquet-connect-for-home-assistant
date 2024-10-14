@@ -21,6 +21,15 @@
         "require_admin": false,
         "mode": "storage",
         "url_path": "dashboard-testr"
+      },
+      {
+        "id": "map",
+        "icon": "mdi:map",
+        "title": "Map",
+        "url_path": "map",
+        "mode": "storage",
+        "show_in_sidebar": true,
+        "require_admin": false
       }
     ]
   }

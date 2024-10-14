@@ -43,3 +43,16 @@ custom_components/frisquet_connect/__pycache__/water_heater.cpython-311.pyc
 .gitignore
 .storage/lovelace
 .gitignore
+.storage/lovelace_dashboards
+.storage/lovelace.map
+.storage/map
+custom_components/frisquet_connect/__pycache__/__init__.cpython-312.pyc
+custom_components/frisquet_connect/__pycache__/climate.cpython-312.pyc
+custom_components/frisquet_connect/__pycache__/config_flow.cpython-312.pyc
+custom_components/frisquet_connect/__pycache__/const.cpython-312.pyc
+custom_components/frisquet_connect/__pycache__/frisquetAPI.cpython-312.pyc
+custom_components/frisquet_connect/__pycache__/sensor.cpython-312.pyc
+custom_components/frisquet_connect/__pycache__/water_heater.cpython-312.pyc
+.storage/lovelace_dashboards
+.storage/lovelace_dashboards
+.gitignore
