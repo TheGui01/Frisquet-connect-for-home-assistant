@@ -26,8 +26,6 @@
               ]
             },
             {
-              "type": "tile",
-              "entity": "climate.zone_1",
               "features": [
                 {
                   "type": "climate-preset-modes",
@@ -52,7 +50,9 @@
                 {
                   "type": "target-temperature"
                 }
-              ]
+              ],
+              "type": "tile",
+              "entity": "climate.maison_zone_1"
             }
           ]
         }
