@@ -117,6 +117,9 @@ class FrisquetGetInfo:
                         if response["zones"][i]["numero"] != "":
                             if i == 0:
                                 self.data[data["sites"][site]] = {}
+                                self.data[data["sites"][site]]["alarmes"] = {}
+                            self.data[data["sites"][site]
+                                      ]["alarmes"] = response["alarmes"]
                             self.data[data["sites"][site]
                                       ]["zone"+str(i+1)] = {}
                             self.data[data["sites"][site]]["zone" +

@@ -51,6 +51,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         entity3 = FrisquetThermometerExt(entry, coordinator.my_api, "zone1")
         entitylist.append(entity3)
 
+    entity4 = FrisquetAlert(entry, coordinator.my_api, "zone1")
+    entitylist.append(entity4)
     async_add_entities(entitylist, update_before_add=False)
 
 
@@ -177,6 +179,69 @@ class ConsoCHF(SensorEntity, CoordinatorEntity):
             model=self.coordinator.data[self.site][self.idx]["produit"],
             serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
         )
+
+
+class FrisquetAlert(SensorEntity, CoordinatorEntity):
+    data: dict = {}
+    _hass: HomeAssistant
+
+    async def async_update(self):
+        self.coordinator.data = FrisquetConnectEntity.data
+        _LOGGER.debug("In sensor.py async update alert ")
+        if self._attr_unique_id == "A"+self.IDChaudiere + str(9):
+            if self.coordinator.data[self.site]["alarmes"]:
+                self._attr_native_value = self.coordinator.data[self.site]["alarmes"][0]["nom"]
+            else:
+                self._attr_native_value = "Aucune alerte en cours"
+
+    def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
+
+        _LOGGER.debug("Sensors Alert Coordinator : %s", coordinator)
+        super().__init__(coordinator)
+        self.idx = idx
+        site = config_entry.title
+        self.site = site
+        self.site = site
+        self.IDChaudiere = coordinator.data[site][idx]["identifiant_chaudiere"]
+        self._attr_unique_id = "A"+self.IDChaudiere + str(9)
+
+        self._attr_name = "Alerte"
+        if coordinator.data[site]["alarmes"]:
+            self._attr_native_value = coordinator.data[site]["alarmes"][0]["nom"]
+        else:
+            self._attr_native_value = "Aucune alerte en cours"
+
+        self._attr_has_entity_name = True
+        # self._attr_native_unit_of_measurement = "°C"
+        # self._attr_unit_of_measurement = "°C"
+
+        self.data[idx] = {}
+        self.data[idx].update(coordinator.data[site][idx])
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                # self.unique_id)
+                (DOMAIN, self.coordinator.data[self.site]
+                 [self.idx]["identifiant_chaudiere"])
+            },
+            name=self.coordinator.data["nomInstall"],  # self.name
+            manufacturer="Frisquet",
+            model=self.coordinator.data[self.site][self.idx]["produit"],
+            serial_number=self.coordinator.data[self.site][self.idx]["identifiant_chaudiere"],
+        )
+
+    @property
+    def icon(self) -> str | None:
+        return "mdi:alert"
+
+    @property
+    def should_poll(self) -> bool:
+        """Poll for those entities"""
+        return True
 
 
 class FrisquetThermometerExt(SensorEntity, CoordinatorEntity):
