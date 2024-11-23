@@ -50,6 +50,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
                       self.site, self.coordinator.data[self.site]["ecs"][self.idx]["nom"])
         self.current_operation = self.FrisquetToOperation(
             self.coordinator.data[self.site]["ecs"][self.idx]["id"], self.idx)
+        self.token = self.coordinator.data[self.site][self.idx]["token"]
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
@@ -60,6 +61,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
         self._attr_name = "Chauffe-eau " + self.site
         self.IDchaudiere = coordinator.data[self.site]["zone1"]["identifiant_chaudiere"]
         self.token = coordinator.data[self.site]["zone1"]["token"]
+
         self._attr_unique_id = "WH"+self.IDchaudiere + str(9)
         self.idx = idx
         if idx == "MODE_ECS":
