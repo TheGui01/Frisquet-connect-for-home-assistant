@@ -50,7 +50,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
                       self.site, self.coordinator.data[self.site]["ecs"][self.idx]["nom"])
         self.current_operation = self.FrisquetToOperation(
             self.coordinator.data[self.site]["ecs"][self.idx]["id"], self.idx)
-        self.token = self.coordinator.data[self.site][self.idx]["token"]
+        self.token = self.coordinator.data[self.site]["zone1"]["token"]
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
