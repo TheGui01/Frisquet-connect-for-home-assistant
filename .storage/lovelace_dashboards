@@ -26,7 +26,7 @@
         "id": "map",
         "icon": "mdi:map",
         "title": "Map",
-        "url_path": "map",
+        "url_path": "lovelace-map",
         "mode": "storage",
         "show_in_sidebar": true,
         "require_admin": false

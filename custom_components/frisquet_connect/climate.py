@@ -238,6 +238,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
         _temp: int = kwargs["temperature"]*10
         _LOGGER.debug("Key : %s", _key)
         await self.OrderToFrisquestAPI(_key, _temp)
+        self._attr_target_temperature = kwargs["temperature"]
 
     async def async_set_preset_mode(self, preset_mode):
         _LOGGER.debug("async_set_preset_mode requested: %s", preset_mode)
