@@ -1,7 +1,7 @@
 from .const import DOMAIN, ORDER_API
 from .frisquetAPI import FrisquetGetInfo
 import logging
-import pytz
+from zoneinfo import ZoneInfo
 from datetime import timedelta
 import aiohttp
 from homeassistant.components.climate.const import (
@@ -357,9 +357,11 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             return HVACMode.OFF
 
     def getPresetFromProgramation(self):
-
-        desired_timezone = pytz.timezone(self.tz)
+        print(self.tz)
+        # desired_timezone = pytz.timezone(self.tz)
+        desired_timezone = ZoneInfo(self.tz)
         maintenant = datetime.now(desired_timezone)
+
         jour: int = maintenant.weekday() + 1
         if jour == 7:
             jour = 0
