@@ -40,7 +40,7 @@ class PRESET_MODE(StrEnum):
 
 
 class WaterHeaterModes(StrEnum):
-    MAX = "Max"
+    MAX = "MAX"
     ECO = "Eco"
     ECOT = "Eco Timer"
     ECOP = "Eco+"
