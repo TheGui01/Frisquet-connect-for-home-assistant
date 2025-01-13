@@ -64,18 +64,29 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
 
         self._attr_unique_id = "WH"+self.IDchaudiere + str(9)
         self.idx = idx
-        if idx == "MODE_ECS":
-            self.operation_list = [WaterHeaterModes.MAX, WaterHeaterModes.ECO, WaterHeaterModes.ECOT,
-                                   WaterHeaterModes.ECOP, WaterHeaterModes.ECOPT, WaterHeaterModes.OFF]
-        elif idx == "MODE_ECS_PAC":
-            self.operation_list = [WaterHeaterModes.ON, WaterHeaterModes.OFF]
+        self.operation_list = []
+        if "MAX" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.MAX)
+        if "Eco" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.ECO)
+        if "Eco Timer" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.ECOT)
+        if "Eco +" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.ECOP)
+        if "Eco + Timer" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.ECOPT)
+        if "Stop" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.OFF)
+        if "On" in coordinator.data[self.site]["modes_ecs_"]:
+            self.operation_list.append(WaterHeaterModes.OFF)
+
         self.current_operation = self.FrisquetToOperation(
             coordinator.data[self.site]["ecs"][idx]["id"], idx)
 
         self.temperature_unit = "°C"
         self._attr_supported_features = WaterHeaterEntityFeature.OPERATION_MODE
 
-    @property
+    @ property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
@@ -91,7 +102,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
             serial_number=self.coordinator.data[self.site]["zone1"]["identifiant_chaudiere"],
         )
 
-    @property
+    @ property
     def should_poll(self) -> bool:
         """Poll for those entities"""
         return True
@@ -109,10 +120,10 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
         await FrisquetConnectEntity.OrderToFrisquestAPI(self, "MODE_ECS", mode)
 
     async def async_turn_off(self):
-        if self.idx == "MODE_ECS_PAC":
-            mode = int(0)
-        elif self.idx == "MODE_ECS":
-            mode = int(5)
+
+        mode = int(self.coordinator.data[self.site]
+                   ["modes_ecs_"][operation_mode])
+
         operation_mode = "Stop"
         self.current_operation = operation_mode
         # self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
@@ -120,44 +131,14 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
         pass
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
-        if operation_mode == "Max":
-            mode = int(0)
-        if operation_mode == "Eco":
-            mode = int(1)
-        if operation_mode == "Eco Timer":
-            mode = int(2)
-        if operation_mode == "Eco+":
-            mode = int(3)
-        if operation_mode == "Eco+ Timer":
-            mode = int(4)
-        if operation_mode == "Stop":
-            if self.idx == "MODE_ECS_PAC":
-                mode = int(0)
-            if self.idx == "MODE_ECS":
-                mode = int(5)
-        if operation_mode == "On":
-            mode = int(5)
+        mode = int(self.coordinator.data[self.site]
+                   ["modes_ecs_"][operation_mode])
 
         self.current_operation = operation_mode
         self.coordinator.data[self.site]["ecs"][self.idx]["id"] = mode
         await FrisquetConnectEntity.OrderToFrisquestAPI(self, "MODE_ECS", mode)
 
     def FrisquetToOperation(self, idFrisquet, idx):
-        if idx == "MODE_ECS":
-            if idFrisquet == 0:
-                return "Max"
-            elif idFrisquet == 1:
-                return "Eco"
-            elif idFrisquet == 2:
-                return "Eco Timer"
-            elif idFrisquet == 3:
-                return "Eco+"
-            elif idFrisquet == 4:
-                return "Eco+ Timer"
-            elif idFrisquet == 5:
-                return "Stop"
-        elif idx == "MODE_ECS_PAC":
-            if idFrisquet == 5:
-                return "On"
-            if idFrisquet == 0:
-                return "Stop"
+        for k in self.coordinator.data[self.site]["modes_ecs_"].items():
+            if k[1] == idFrisquet:
+                return k[0]

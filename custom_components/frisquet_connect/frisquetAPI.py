@@ -124,7 +124,9 @@ class FrisquetGetInfo:
                                       ]["zone"+str(i+1)] = {}
                             self.data[data["sites"][site]]["zone" +
                                                            str(i+1)] = response["zones"][i]["carac_zone"]
-                            self.data[data["sites"][site]]["zone"+str(
+
+                            # self.data[data["sites"][site]]["modes_ecs_"] = response["modes_ecs_"]
+                            self.data[data["sites"][site]]["zone" + str(
                                 i+1)]["boost_disponible"] = response["zones"][i]["boost_disponible"]
                             self.data[data["sites"][site]]["zone" +
                                                            str(i+1)]["identifiant"] = response["zones"][i]["identifiant"]
@@ -164,6 +166,19 @@ class FrisquetGetInfo:
                                                            str(i+1)]["password"] = password
                             self.data[data["sites"][site]]["zone" +
                                                            str(i+1)]["T_EXT"] = response["environnement"]["T_EXT"]
+
+                            self.data[data["sites"][site]]["modes_ecs_"] = {}
+                            for w in range(len(response["modes_ecs"])):
+                                nomModeECS: str
+                                idModeECS: str
+                                nomModeECS = response["modes_ecs"][w]["nom"]
+                                nomModeECS = nomModeECS.replace(
+                                    "\ue809", "Timer")
+                                idModeECS = response["modes_ecs"][w]["id"]
+                                self.data[data["sites"][site]
+                                          ]["modes_ecs_"][nomModeECS] = {}
+                                self.data[data["sites"][site]
+                                          ]["modes_ecs_"][nomModeECS] = idModeECS
                             # to test Site 2 :
                             # if site == 1 :
                             #  self.data[data["sites"][site]] ={}
