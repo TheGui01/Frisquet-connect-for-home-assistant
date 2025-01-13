@@ -116,8 +116,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
             mode = int(1)
 
         self.current_operation = operation_mode
-        # self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
-        await FrisquetConnectEntity.OrderToFrisquestAPI(self, "MODE_ECS", mode)
+        await FrisquetConnectEntity.OrderToFrisquestAPI(self, self.idx, mode)
 
     async def async_turn_off(self):
 
@@ -126,8 +125,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
 
         operation_mode = "Stop"
         self.current_operation = operation_mode
-        # self.coordinator.data[self.site]["ecs"]["MODE_ECS"]["id"] = mode
-        await FrisquetConnectEntity.OrderToFrisquestAPI(self, "MODE_ECS", mode)
+        await FrisquetConnectEntity.OrderToFrisquestAPI(self, self.idx, mode)
         pass
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
@@ -136,7 +134,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
 
         self.current_operation = operation_mode
         self.coordinator.data[self.site]["ecs"][self.idx]["id"] = mode
-        await FrisquetConnectEntity.OrderToFrisquestAPI(self, "MODE_ECS", mode)
+        await FrisquetConnectEntity.OrderToFrisquestAPI(self, self.idx, mode)
 
     def FrisquetToOperation(self, idFrisquet, idx):
         for k in self.coordinator.data[self.site]["modes_ecs_"].items():
