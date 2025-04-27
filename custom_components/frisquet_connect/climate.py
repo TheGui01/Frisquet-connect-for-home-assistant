@@ -1,9 +1,11 @@
-from .const import DOMAIN, ORDER_API
+from .const import DOMAIN, ORDER_API, WS_API
 from .frisquetAPI import FrisquetGetInfo
 import logging
 from zoneinfo import ZoneInfo
 from datetime import timedelta
-import aiohttp
+import aiohttp  # type: ignore
+import asyncio
+
 from homeassistant.components.climate.const import (
     ClimateEntityFeature,
     HVACMode,
@@ -295,6 +297,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
 
         self._attr_preset_mode = preset_mode
         await self.OrderToFrisquestAPI(_key, mode)
+        # asyncio.run(self.websocket_confirmation)
 
     def DefineavAilablePresetmodes(self, boost: bool):
         _LOGGER.debug("defineaavailPresetMode")
@@ -382,6 +385,24 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             else:
                 pass
 
+    async def websocket_confirmation(self):
+        _session = aiohttp.ClientSession()
+
+        uri = WS_API+"?token="+self.token+"&identifiant_chaudiere=" + \
+            self.IDchaudiere  # Remplacez par l'URI de votre WebSocket
+        _LOGGER.debug("In websocket_confirmation with url : '%s", uri)
+        async with _session.ws_connect(uri) as ws:
+            await ws.send_str(str({"type": "ORDRE_EN_ATTENTE"}))
+            _LOGGER.debug("In websocket_confirmation order sent")
+            async for msg in ws:
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    print("Message reçu :", msg.data)
+
+                elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR, "ORDRE_OK"):
+                    break
+
+            await _session.close()
+
     async def OrderToFrisquestAPI(self, key, valeur):
         if key == "MODE_ECS":
             idx = "zone1"
@@ -392,20 +413,25 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
         _LOGGER.debug("In OrderToFrisquestAPI IDChaudiere :'%s", _IDChaudiere)
         _url = ORDER_API+_IDChaudiere+"?token="+self.token
         _LOGGER.debug("In OrderToFrisquestAPI with url :'%s", _url)
-        headers = {
-            'Host': 'fcutappli.frisquet.com',
-            'Content-Type': 'application/json',
-            'Accept': '*/*',
-            'User-Agent': 'Frisquet Connect/2.5 (com.frisquetsa.connect; build:47; iOS 16.3.1) Alamofire/5.2.2',
-            'Accept-Language': 'en-FR;q=1.0, fr-FR;q=0.9'
-        }
-
         json_data = [
             {
                 "cle": key,
                 "valeur": str(int(valeur))
             }
         ]
+        headers = {
+            'Accept-Language': 'FR',
+            'Android-Version': '2.8.1',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Length': str(len(str(json_data))),
+            'Host': 'fcutappli.frisquet.com',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
+            'User-Agent': 'okhttp/4.12.0'
+
+        }
+
+        _LOGGER.debug("In OrderToFrisquestAPI call header :'%s", headers)
         _LOGGER.debug("In OrderToFrisquestAPI call :'%s", json_data)
         async with await _session.post(url=_url, headers=headers, json=json_data) as resp:
             json_data = await resp.json()
@@ -413,6 +439,20 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             await _session.close()
             self.TimeLastOrder = time.time()
             # time.sleep(2)
+
+        asyncio.create_task(self.websocket_confirmation())
+        # Vérifier si une boucle d'événements est déjà en cours d'exécution
+        # try:
+        #    loop = asyncio.get_running_loop()
+        # except RuntimeError:  # Pas de boucle en cours d'exécution
+        #    loop = None
+
+        # if loop and loop.is_running():
+        #    print("Une boucle d'événements est déjà en cours d'exécution.")
+        #    tsk = loop.create_task(self.websocket_confirmation())
+        #    loop.run_until_complete(tsk)
+        # else:
+        #    asyncio.run(self.websocket_confirmation())
 
 
 class MyCoordinator(DataUpdateCoordinator):

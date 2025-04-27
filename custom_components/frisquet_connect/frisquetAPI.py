@@ -27,15 +27,24 @@ class FrisquetGetInfo:
 
     async def getSite(self, data):
         self.data: dict = {}
-        headers = {
-            'Content-Type': 'application/json'
-        }
         Initjson_data = {
             "locale": "fr",
             "email": data["email"],
             "password": data["password"],
             "type_client": "IOS",
         }
+        headers = {
+            'Accept-Language': 'FR',
+            'Android-Version': '2.8.1',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Length': str(len(str(Initjson_data))),
+            'Host': 'fcutappli.frisquet.com',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
+            'User-Agent': 'okhttp/4.12.0'
+
+        }
+
         email = data["email"]
         password = data["password"]
 
@@ -59,14 +68,22 @@ class FrisquetGetInfo:
 
     async def getTokenAndInfo(self, data, idx, site):
         # self.data: dict = {}
-        headers = {
-            'Content-Type': 'application/json'
-        }
         Initjson_data = {
             "locale": "fr",
             "email": data["email"],
             "password": data["password"],
             "type_client": "IOS",
+        }
+        headers = {
+            'Accept-Language': 'FR',
+            'Android-Version': '2.8.1',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Length': str(len(str(Initjson_data))),
+            'Host': 'fcutappli.frisquet.com',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
+            'User-Agent': 'okhttp/4.12.0'
+
         }
         email = data["email"]
         password = data["password"]

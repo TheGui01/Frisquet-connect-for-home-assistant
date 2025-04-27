@@ -5,9 +5,10 @@ from enum import IntFlag, StrEnum
 DOMAIN = "frisquet_connect"
 PLATFORMS: list[Platform] = [Platform.CLIMATE,
                              Platform.SENSOR, Platform.WATER_HEATER]
-AUTH_API = "https://fcutappli.frisquet.com/api/v1/authentifications"
+AUTH_API = "https://fcutappli.frisquet.com/api/v1/authentifications?app_id=dXk9XRsJQ8WfuO3IAsgpxr"
 API_URL = "https://fcutappli.frisquet.com/api/v1/sites/"
 ORDER_API = "https://fcutappli.frisquet.com/api/v1/ordres/"
+WS_API = "https://fcappcom.frisquet.com/"
 CONF_SITE_ID = 0
 
 DEVICE_MANUFACTURER = "Frisquet"
