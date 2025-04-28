@@ -440,7 +440,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             self.TimeLastOrder = time.time()
             # time.sleep(2)
 
-        asyncio.create_task(self.websocket_confirmation())
+        asyncio.create_task(FrisquetConnectEntity.websocket_confirmation(self))
         # Vérifier si une boucle d'événements est déjà en cours d'exécution
         # try:
         #    loop = asyncio.get_running_loop()
