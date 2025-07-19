@@ -66,6 +66,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         entity2 = FrisquetConnectEntity(
             entry, coordinator.my_api, "zone2", coordinator.my_api.data["nomInstall"])
         entitylist.append(entity2)
+    if "zone3" in coordinator.my_api.data[coordinator.my_api.data["nomInstall"]]:
+        _LOGGER.debug(
+            "In Climate.py asyncsetup entry zone2 found creating a 3rd climate")
+        entity3 = FrisquetConnectEntity(
+            entry, coordinator.my_api, "zone3", coordinator.my_api.data["nomInstall"])
+        entitylist.append(entity3)
     async_add_entities(entitylist, update_before_add=False)
 
 
