@@ -45,6 +45,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             "In sensor.py asyncsetup entry zone2 found creating a 2nd sensor")
         entity2 = FrisquetThermometer(entry, coordinator.my_api, "zone2")
         entitylist.append(entity2)
+    if "zone3" in coordinator.my_api.data[coordinator.my_api.data["nomInstall"]]:
+        _LOGGER.debug(
+            "In sensor.py asyncsetup entry zone3 found creating a 3rd sensor")
+        entity5 = FrisquetThermometer(entry, coordinator.my_api, "zone3")
+        entitylist.append(entity5)
     if coordinator.my_api.data[coordinator.my_api.data["nomInstall"]]["zone1"]["T_EXT"] is not None:
         _LOGGER.debug(
             "In sensor.py asyncsetup entry T_EXT found creating a Ext. sensor")
