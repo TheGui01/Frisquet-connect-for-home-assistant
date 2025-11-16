@@ -10,5 +10,5 @@
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/TheGui01/Friquest-connect-for-home-assistant/issues",
     "quality_scale": "silver",
-    "version": "2.3.4"
+    "version": "2.3.5"
 }
