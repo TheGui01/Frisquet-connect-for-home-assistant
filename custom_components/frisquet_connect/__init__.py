@@ -37,13 +37,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  #
 
     return True
 
-# async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-#    """Unload a config entry."""
-#    my_api = hass.data[DOMAIN][entry.unique_id]
-#    _LOGGER.debug("ansyc unload")
-#    return await hass.config_entries.async_reload(entry.entry_id)
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Unload a config entry."""
+    _LOGGER.debug("ansyc unload")
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        entry, PLATFORMS)
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.unique_id)
+    return unload_ok
+
+    # my_api = hass.data[DOMAIN][entry.unique_id]
+    # _LOGGER.debug("ansyc unload")
+    # return await hass.config_entries.async_reload(entry.entry_id)
+
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload the config entry."""
+    # Appelle async_unload_entry puis async_setup_entry pour recharger
+    await async_unload_entry(hass, entry.unique_id)
+    await async_setup_entry(hass, entry.unique_id)
 
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Fonction qui force le rechargement des entités associées à une configEntry"""
-    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.config_entries.async_reload(entry.unique_id)
