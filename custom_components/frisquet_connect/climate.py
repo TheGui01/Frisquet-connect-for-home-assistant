@@ -100,24 +100,26 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             self.data[site][self.idx]["date_derniere_remontee"] = 0
             _LOGGER.debug("In Climate.py async exception reached")
 
-        if float(self.data[site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
-            if self.device_info["serial_number"] == self.IDchaudiere:
-                _LOGGER.debug(
-                    "In Climate.py async update in progress %s", self.site)
-                site = self.site
-                self._attr_current_temperature = self.data[site][self.idx]["TAMB"] / 10
-                self.Derogation = self.data[site][self.idx]["DERO"]
-                self.token = self.data[site][self.idx]["token"]
-                self._attr_preset_mode = self.defPreset(self.data[site][self.idx]["SELECTEUR"], self.data[site]
-                                                        [self.idx]["MODE"], self.data[site][self.idx]["ACTIVITE_BOOST"], self.data[site][self.idx]["DERO"])
-                self._attr_hvac_mode = self.modeFrisquetToHVAC(self.data[site][self.idx]["MODE"], self.data[site][self.idx]["DERO"],
-                                                               self._attr_preset_mode, self.data[site][self.idx]["CAMB"] / 10, self.data[site][self.idx]["TAMB"] / 10)
-                self._attr_target_temperature = self.defConsigneTemp(
-                    self._attr_preset_mode, self.data[site][self.idx]["CONS_CONF"] / 10, self.data[site][self.idx]["CONS_RED"] / 10, self.data[site][self.idx]["CONS_HG"] / 10)
+        try:
+            if float(self.data[site][self.idx]["date_derniere_remontee"]) > float(self.TimeLastOrder):
+                if self.device_info["serial_number"] == self.IDchaudiere:
+                    _LOGGER.debug(
+                        "In Climate.py async update in progress %s", self.site)
+                    site = self.site
+                    self._attr_current_temperature = self.data[site][self.idx]["TAMB"] / 10
+                    self.Derogation = self.data[site][self.idx]["DERO"]
+                    self.token = self.data[site][self.idx]["token"]
+                    self._attr_preset_mode = self.defPreset(self.data[site][self.idx]["SELECTEUR"], self.data[site]
+                                                            [self.idx]["MODE"], self.data[site][self.idx]["ACTIVITE_BOOST"], self.data[site][self.idx]["DERO"])
+                    self._attr_hvac_mode = self.modeFrisquetToHVAC(self.data[site][self.idx]["MODE"], self.data[site][self.idx]["DERO"],
+                                                                   self._attr_preset_mode, self.data[site][self.idx]["CAMB"] / 10, self.data[site][self.idx]["TAMB"] / 10)
+                    self._attr_target_temperature = self.defConsigneTemp(
+                        self._attr_preset_mode, self.data[site][self.idx]["CONS_CONF"] / 10, self.data[site][self.idx]["CONS_RED"] / 10, self.data[site][self.idx]["CONS_HG"] / 10)
 
-        else:
-            _LOGGER.debug("In Climate.py async update No Update")
-
+            else:
+                _LOGGER.debug("In Climate.py async update No Update")
+        except:
+            _LOGGER.debug("In Climate.py async update Exception No Update")
         # pass
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx, site) -> None:

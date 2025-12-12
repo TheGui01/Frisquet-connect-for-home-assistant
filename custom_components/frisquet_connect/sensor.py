@@ -61,13 +61,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     async_add_entities(entitylist, update_before_add=False)
 
 
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Décharger les capteurs de cette entrée."""
+    # Récupérer les entités associées à cette entrée
+    _LOGGER.debug("Sensors Unload_entry")
+    if DOMAIN in hass.data and entry.unique_id in hass.data[DOMAIN]:
+        # Supprimer les entités (exemple simplifié)
+        for entity in hass.data[DOMAIN][entry.unique_id].get("entities", []):
+            await entity.async_remove()
+        return True
+    return False
+
+
 class ConsoSAN(SensorEntity, CoordinatorEntity):
     data: dict = {}
 
     async def async_update(self):
-        self.coordinator.data = FrisquetConnectEntity.data
-        _LOGGER.debug("In sensor.py async update SAN %s", self)
-        self._attr_native_value = self.coordinator.data[self.site][self.idx]["energy"]["SAN"]
+        try:
+            self.coordinator.data = FrisquetConnectEntity.data
+            _LOGGER.debug("In sensor.py async update SAN %s", self)
+            self._attr_native_value = self.coordinator.data[self.site][self.idx]["energy"]["SAN"]
+        except Exception as e:
+            _LOGGER.error("Error updating SAN sensor: %s", e)
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
@@ -128,10 +143,13 @@ class ConsoCHF(SensorEntity, CoordinatorEntity):
     data: dict = {}
 
     async def async_update(self):
-        self.coordinator.data = FrisquetConnectEntity.data
-        _LOGGER.debug("In sensor.py CHF async update %s", self)
-        if self.unique_id == "CHF"+self.IDChaudiere + str(9):
-            self._attr_native_value = self.coordinator.data[self.site][self.idx]["energy"]["CHF"]
+        try:
+            self.coordinator.data = FrisquetConnectEntity.data
+            _LOGGER.debug("In sensor.py CHF async update %s", self)
+            if self.unique_id == "CHF"+self.IDChaudiere + str(9):
+                self._attr_native_value = self.coordinator.data[self.site][self.idx]["energy"]["CHF"]
+        except Exception as e:
+            _LOGGER.error("Error updating CHF sensor: %s", e)
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
@@ -191,13 +209,16 @@ class FrisquetAlert(SensorEntity, CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
-        self.coordinator.data = FrisquetConnectEntity.data
-        _LOGGER.debug("In sensor.py async update alert ")
-        if self._attr_unique_id == "A"+self.IDChaudiere + str(9):
-            if self.coordinator.data[self.site]["alarmes"]:
-                self._attr_native_value = self.coordinator.data[self.site]["alarmes"][0]["nom"]
-            else:
-                self._attr_native_value = "Aucune alerte en cours"
+        try:
+            self.coordinator.data = FrisquetConnectEntity.data
+            _LOGGER.debug("In sensor.py async update alert ")
+            if self._attr_unique_id == "A"+self.IDChaudiere + str(9):
+                if self.coordinator.data[self.site]["alarmes"]:
+                    self._attr_native_value = self.coordinator.data[self.site]["alarmes"][0]["nom"]
+                else:
+                    self._attr_native_value = "Aucune alerte en cours"
+        except Exception as e:
+            _LOGGER.error("Error updating Alert sensor: %s", e)
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
@@ -254,11 +275,14 @@ class FrisquetThermometerExt(SensorEntity, CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
-        self.coordinator.data = FrisquetConnectEntity.data
-        _LOGGER.debug("In sensor.py async update T_ext %s with temp: %s",
-                      self.site, self.coordinator.data[self.site][self.idx]["T_EXT"] / 10)
-        if self._attr_unique_id == "T"+self.IDChaudiere + str(9):
-            self._attr_native_value = self.coordinator.data[self.site][self.idx]["T_EXT"] / 10
+        try:
+            self.coordinator.data = FrisquetConnectEntity.data
+            _LOGGER.debug("In sensor.py async update T_ext %s with temp: %s",
+                          self.site, self.coordinator.data[self.site][self.idx]["T_EXT"] / 10)
+            if self._attr_unique_id == "T"+self.IDChaudiere + str(9):
+                self._attr_native_value = self.coordinator.data[self.site][self.idx]["T_EXT"] / 10
+        except Exception as e:
+            _LOGGER.error("Error updating T_EXT sensor: %s", e)
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
@@ -321,11 +345,14 @@ class FrisquetThermometer(SensorEntity, CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
-        self.coordinator.data = FrisquetConnectEntity.data
-        _LOGGER.debug("In sensor.py async update %s with temp: %s", self.site,
-                      self.coordinator.data[self.site][self.idx]["TAMB"] / 10)
-        if self._attr_unique_id == "T" + str(self.IDchaudiere) + str(self.numeroZone):
-            self._attr_native_value = self.coordinator.data[self.site][self.idx]["TAMB"] / 10
+        try:
+            self.coordinator.data = FrisquetConnectEntity.data
+            _LOGGER.debug("In sensor.py async update %s with temp: %s", self.site,
+                          self.coordinator.data[self.site][self.idx]["TAMB"] / 10)
+            if self._attr_unique_id == "T" + str(self.IDchaudiere) + str(self.numeroZone):
+                self._attr_native_value = self.coordinator.data[self.site][self.idx]["TAMB"] / 10
+        except Exception as e:
+            _LOGGER.error("Error updating Thermometer sensor: %s", e)
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 

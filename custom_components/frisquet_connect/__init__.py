@@ -38,25 +38,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  #
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+# async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
-    _LOGGER.debug("ansyc unload")
-    unload_ok = await hass.config_entries.async_unload_platforms(
-        entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.unique_id)
-    return unload_ok
+  #  _LOGGER.debug(f"Début du déchargement de l'entrée {entry.entry_id}")
 
-    # my_api = hass.data[DOMAIN][entry.unique_id]
-    # _LOGGER.debug("ansyc unload")
-    # return await hass.config_entries.async_reload(entry.entry_id)
+   # unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+    # if unload_ok:
+    #    if DOMAIN in hass.data and entry.unique_id in hass.data[DOMAIN]:
+    #        await hass.data[DOMAIN].pop(entry.unique_id)
+    #        _LOGGER.debug(
+    #            "Données de l'entrée {entry.entry_id} supprimées de hass.data[{DOMAIN}]")
+    #    else:
+    #        _LOGGER.warning(
+    #            "Aucune donnée trouvée pour l'entrée {entry.entry_id} dans hass.data[{DOMAIN}]")
+    # else:
+    #    _LOGGER.error(
+    #       "Échec du déchargement des plateformes pour l'entrée {entry.entry_id}")
+    # return unload_ok
 
 
-async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+# async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload the config entry."""
     # Appelle async_unload_entry puis async_setup_entry pour recharger
-    await async_unload_entry(hass, entry.unique_id)
-    await async_setup_entry(hass, entry.unique_id)
+   # for entry in PLATFORMS:
+   #     await async_unload_entry(hass, entry.unique_id)
+
+  #  await async_setup_entry(hass, entry.unique_id)
 
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:

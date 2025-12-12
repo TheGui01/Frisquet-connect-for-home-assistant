@@ -45,12 +45,14 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
     _hass: HomeAssistant
 
     async def async_update(self):
-
-        _LOGGER.debug("In sensor.py async update water heater site: %s mode: %s",
-                      self.site, self.coordinator.data[self.site]["ecs"][self.idx]["nom"])
-        self.current_operation = self.FrisquetToOperation(
-            self.coordinator.data[self.site]["ecs"][self.idx]["id"], self.idx)
-        self.token = self.coordinator.data[self.site]["zone1"]["token"]
+        try:
+            _LOGGER.debug("In sensor.py async update water heater site: %s mode: %s",
+                          self.site, self.coordinator.data[self.site]["ecs"][self.idx]["nom"])
+            self.current_operation = self.FrisquetToOperation(
+                self.coordinator.data[self.site]["ecs"][self.idx]["id"], self.idx)
+            self.token = self.coordinator.data[self.site]["zone1"]["token"]
+        except Exception as e:
+            _LOGGER.error("Error in async_update water heater: %s", e)
 
     def __init__(self, config_entry: ConfigEntry, coordinator: CoordinatorEntity, idx) -> None:
 
@@ -86,7 +88,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
         self.temperature_unit = "°C"
         self._attr_supported_features = WaterHeaterEntityFeature.OPERATION_MODE
 
-    @ property
+    @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
@@ -102,7 +104,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
             serial_number=self.coordinator.data[self.site]["zone1"]["identifiant_chaudiere"],
         )
 
-    @ property
+    @property
     def should_poll(self) -> bool:
         """Poll for those entities"""
         return True
