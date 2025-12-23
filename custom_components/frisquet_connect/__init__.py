@@ -1,5 +1,6 @@
 """Initialisation du package de l'intégration Frisquet Connect"""
 import logging
+import asyncio
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed

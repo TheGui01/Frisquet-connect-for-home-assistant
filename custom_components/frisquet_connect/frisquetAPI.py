@@ -55,30 +55,20 @@ class FrisquetGetInfo:
 
     async def getTokenAndInfo(self, entry, data, idx, site, retry=False):
         # retry=False : Pour pouvoir relancé 1 fois ne cas de token expiré
-        if entry is not None:
-            _LOGGER.debug("JKS entry data  not None")  # : %s", entry.data)
-        else:
-            _LOGGER.debug("JKS entry data : <None> (config_flow)")
 
-        # _LOGGER.error("DEBUG entry.data = %s", entry.data if entry else None)
-        # _LOGGER.error("DEBUG data (runtime) = %s", data)
-
-        # Credentials
-        # email    = entry.data["zone1"]["email"]
-        # password = entry.data["zone1"]["password"]
-        # Si on a une zone sinon prendre l'entrée du formulaire
-        # if entry.data.get("zone1"):
-        #    email = zone1["email"]
-        #    password = zone1["password"]
-       # else:
         zone1 = {}
-        # --- Récupération des credentials ---
-        token = self.data.get("token") or data.get(
-            "token") or entry.data.get("token")
+        
+        # --- Récupération du token ---
+        # priorité 
+        token = self.data.get("token") or data.get("token")
 
+        # fallback : token persisté UNIQUEMENT au premier run 
+        if not token and not retry:
+            token = entry.data.get("token") if entry else None
+
+        # --- Récupération des credentials ---
         email = entry.data.get("email") if entry else data.get("email")
-        password = entry.data.get(
-            "password") if entry else data.get("password")
+        password = entry.data.get("password") if entry else data.get("password")
 
         auth_json_reply = None
 
