@@ -57,18 +57,19 @@ class FrisquetGetInfo:
         # retry=False : Pour pouvoir relancé 1 fois ne cas de token expiré
 
         zone1 = {}
-        
+
         # --- Récupération du token ---
-        # priorité 
+        # priorité
         token = self.data.get("token") or data.get("token")
 
-        # fallback : token persisté UNIQUEMENT au premier run 
+        # fallback : token persisté UNIQUEMENT au premier run
         if not token and not retry:
             token = entry.data.get("token") if entry else None
 
         # --- Récupération des credentials ---
         email = entry.data.get("email") if entry else data.get("email")
-        password = entry.data.get("password") if entry else data.get("password")
+        password = entry.data.get(
+            "password") if entry else data.get("password")
 
         auth_json_reply = None
 
@@ -80,6 +81,7 @@ class FrisquetGetInfo:
 
             auth_json_reply = await self.api_auth(email, password)
             token = auth_json_reply.get("token")
+            identifiant = auth_json_reply["utilisateur"]["sites"][site]["identifiant_chaudiere"]
             if not token:
                 raise Exception("Frisquet API did not return a token")
 
@@ -93,13 +95,9 @@ class FrisquetGetInfo:
 
         # ID Chaufière
 
-        if auth_json_reply:
-            identifiant = auth_json_reply["utilisateur"]["sites"][site]["identifiant_chaudiere"]
-        else:
-            identifiant = (
-                entry.data.get("identifiant_chaudiere") if entry
-                else data.get("identifiant_chaudiere")
-            )
+        if auth_json_reply == None:
+            auth_json_reply = await self.api_auth(email, password)
+        identifiant = auth_json_reply["utilisateur"]["sites"][site]["identifiant_chaudiere"]
 
         if not identifiant:
             raise Exception(
