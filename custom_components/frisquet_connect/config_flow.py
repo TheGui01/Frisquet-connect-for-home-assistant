@@ -44,7 +44,6 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
 
         self.data["token"] = auth.get("token")
         self.data["sites"] = [s["nom"] for s in auth.get("utilisateur", {}).get("sites", [])]
-
         # (Optionnel) identifiant chaudière site 0 pour debug/visibilité
         try:
             self.data["identifiant_chaudiere"] = auth["utilisateur"]["sites"][0]["identifiant_chaudiere"]
@@ -81,7 +80,7 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
             "identifiant_chaudiere": self.data.get("identifiant_chaudiere"),
         }
 
-        # Appel API pour construire le payload final 
+        # Appel API pour construire le payload final
         payload = await self.frisquet_api.getTokenAndInfo(
             entry=None,     # pas de ConfigEntry dans le flow
             data=runtime,   # runtime dict mutable
@@ -111,7 +110,7 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         if unique:
             await self.async_set_unique_id(str(unique))
 
-        title = payload.get("nomInstall") or (sites[site] if sites else "Frisquet")
+        title = (sites[site] if sites else "Frisquet")
         payload["email"] = self.data["email"]
         payload["password"] = self.data["password"]
         _LOGGER.debug("Config_Flow payload=%s", payload)
