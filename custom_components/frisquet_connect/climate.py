@@ -220,6 +220,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             self.hvac_mode = "auto"
         else:
             pass
+        self.async_write_ha_state()
 
     async def async_set_temperature(self, **kwargs):
         _LOGGER.debug("In Async Set TEmp: '%s", kwargs["temperature"])
@@ -292,6 +293,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
                 0, self.coordinator.data[self.idx]["DERO"], preset_mode, self.coordinator.data[self.idx]["CAMB"]/10, self._attr_current_temperature)
 
         self._attr_preset_mode = preset_mode
+        self.async_write_ha_state()
         await self.OrderToFrisquestAPI(_key, mode)
         # asyncio.run(self.websocket_confirmation)
 
@@ -359,8 +361,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             return HVACMode.OFF
 
     def getPresetFromProgramation(self):
-        # Newood -- print(self.tz)
-        # desired_timezone = pytz.timezone(self.tz)
+
         desired_timezone = ZoneInfo(self.tz)
         maintenant = datetime.now(desired_timezone)
 
@@ -368,8 +369,6 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
         if jour == 7:
             jour = 0
         minuit = maintenant.replace(hour=0, minute=0, second=0, microsecond=0)
-        # fakemaintenant = minuit.replace(hour=23,minute=31)
-        # maintenant = fakemaintenant
         difference = maintenant - minuit
         nombre_demi_heures = int(difference.total_seconds() / 1800)
         # if len(self.data)== 0 :
@@ -396,9 +395,9 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
                 _LOGGER.debug("In websocket_confirmation order sent")
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.TEXT:
-                        # Newood --print("Message reçu :", msg.data)
+
                         _LOGGER.debug("Message reçu : %s", msg.data)
-                    # Newood -- change start
+
                         try:
                             data = msg.json()
                         except Exception:
@@ -413,15 +412,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
                         if msg_type == "ORDRE_EN_ATTENTE":
                             _LOGGER.debug("ORDRE_EN_ATTENTE")
                             continue
-                    # Newood -- change end
-                        # if msg.data == '{"type":"ORDRE_EN_ATTENTE"}':
-                        #    try:
-                        #       pass  # await self.async_update()
-                        #        # self.async_write_ha_state()
 
-                        #     except:
-                        #         _LOGGER.debug(
-                        #             "In websocket_confirmation exception during update after ordre en attente")
 
                     elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
                         # Newood Add:
@@ -465,18 +456,6 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             _LOGGER.debug("In OrderToFrisquestAPI resp :'%s", json_data)
             await _session.close()
             self.TimeLastOrder = time.time()
-            # time.sleep(2)
+
 
         asyncio.create_task(FrisquetConnectEntity.websocket_confirmation(self))
-        # Vérifier si une boucle d'événements est déjà en cours d'exécution
-        # try:
-        #    loop = asyncio.get_running_loop()
-        # except RuntimeError:  # Pas de boucle en cours d'exécution
-        #    loop = None
-
-        # if loop and loop.is_running():
-        #    print("Une boucle d'événements est déjà en cours d'exécution.")
-        #    tsk = loop.create_task(self.websocket_confirmation())
-        #    loop.run_until_complete(tsk)
-        # else:
-        #    asyncio.run(self.websocket_confirmation())
