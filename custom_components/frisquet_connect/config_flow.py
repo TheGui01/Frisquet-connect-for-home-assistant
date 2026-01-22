@@ -1,6 +1,7 @@
 """ Le Config Flow """
 import logging
-from homeassistant.config_entries import ConfigFlow
+from homeassistant.config_entries import ConfigFlow, OptionsFlow, ConfigEntry
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 import voluptuous as vol
 
@@ -114,3 +115,39 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         payload["password"] = self.data["password"]
         _LOGGER.debug("Config_Flow payload=%s", payload)
         return self.async_create_entry(title=title, data=payload)
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry):
+        return FrisquetOptionsFlowHandler(config_entry)
+
+
+class FrisquetOptionsFlowHandler(OptionsFlow):
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input: dict | None = None) -> FlowResult:
+        """Gère les options (configuration des identifiants)."""
+        if user_input is not None:
+            # Mise à jour des identifiants dans config_entry.data
+            # Note: cela déclenchera un reload via update_listener
+            new_data = {**self.config_entry.data, **user_input}
+            # On vide le token pour forcer une ré-auth propre au prochain appel
+            if "token" in new_data:
+                new_data.pop("token")
+            
+            self.hass.config_entries.async_update_entry(
+                self.config_entry, 
+                data=new_data
+            )
+            return self.async_create_entry(title="", data={})
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("email", default=self.config_entry.data.get("email")): str,
+                    vol.Required("password", default=self.config_entry.data.get("password")): str,
+                }
+            ),
+        )
