@@ -12,6 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+    MINOR_VERSION = 2
     data: dict = {}
 
     async def async_step_user(self, user_input: dict | None = None) -> FlowResult:
@@ -90,8 +91,6 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
 
         # On force quelques champs utiles dans l'entry
         payload["SiteID"] = site
-        payload["email"] = self.data["email"]
-        payload["password"] = self.data["password"]
         payload["token"] = runtime.get("token") or payload.get("token")
 
         # identifiant_chaudiere au niveau racine (utile pour refresh)
