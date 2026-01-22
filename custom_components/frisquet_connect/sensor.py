@@ -1,15 +1,13 @@
 import logging
-from homeassistant.core import HomeAssistant, callback, Event, State
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.sensor import (
     SensorEntity)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.entity_platform import (
     AddEntitiesCallback)
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,)
-from .climate import FrisquetConnectEntity
 from homeassistant.const import UnitOfEnergy
 from .const import DOMAIN
 
