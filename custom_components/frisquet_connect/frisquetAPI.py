@@ -112,7 +112,7 @@ class FrisquetGetInfo:
         _LOGGER.debug(" GET API : %s", url)
         # limit calls to once every 4 minutes
         should_call = (not self.data) or ("Lastcall" not in self.data) or (
-            self.data["Lastcall"] + datetime.timedelta(minutes=4) < datetime.datetime.now())
+            self.data["Lastcall"] + datetime.timedelta(minutes=15) < datetime.datetime.now())
 
         if should_call:
 
