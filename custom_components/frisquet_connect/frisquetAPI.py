@@ -202,25 +202,39 @@ class FrisquetGetInfo:
                 modes[nom] = m.get("id")
             self.data["modes_ecs_"] = modes
 
-            # conso (inchangé, mais il faut écrire dans zone1 si elle existe)
-            try:
-                url2 = f"{API_URL}{identifiant}/conso?token={token}&types[]=CHF&types[]=SAN"
-                headers = {"User-Agent": "okhttp/4.12.0"}
 
-                async with aiohttp.ClientSession(headers=headers) as session2:
-                    async with session2.get(url2) as resp2:
-                        conso = await resp2.json()
+            # --- Vérification pour exécuter le bloc conso une seule fois par jour à partir de 6h00 ---
+            now = datetime.datetime.now()
+            last_conso_run = self.data.get("last_conso_run")
 
-                if "zone1" in self.data:
-                    self.data["zone1"].setdefault("energy", {})
-                    self.data["zone1"]["energy"]["CHF"] = sum(
-                        c["valeur"] for c in conso.get("CHF", []))
-                    if "SAN" in conso:
-                        self.data["zone1"]["energy"]["SAN"] = sum(
-                            c["valeur"] for c in conso.get("SAN", []))
+            # Si c'est la première fois, ou si le jour a changé et qu'il est plus de 6h00
+            if last_conso_run is None or (
+                now.date() != last_conso_run.date() and now.hour >= 6
+            ):
 
-            except Exception:
-                _LOGGER.debug("Conso unavailable")
+
+                # conso (inchangé, mais il faut écrire dans zone1 si elle existe)
+                try:
+                    url2 = f"{API_URL}{identifiant}/conso?token={token}&types[]=CHF&types[]=SAN"
+                    headers = {"User-Agent": "okhttp/4.12.0"}
+
+                    async with aiohttp.ClientSession(headers=headers) as session2:
+                        async with session2.get(url2) as resp2:
+                            conso = await resp2.json()
+
+                    if "zone1" in self.data:
+                        self.data["zone1"].setdefault("energy", {})
+                        self.data["zone1"]["energy"]["CHF"] = sum(
+                            c["valeur"] for c in conso.get("CHF", []))
+                        if "SAN" in conso:
+                            self.data["zone1"]["energy"]["SAN"] = sum(
+                                c["valeur"] for c in conso.get("SAN", []))
+
+                    # Mémorise la date/heure de cette exécution
+                    self.data["last_conso_run"] = now
+
+                except Exception:
+                    _LOGGER.debug("Conso unavailable")
 
             # recopie dans data (ce qui est retourné au coordinator)
             data.clear()
