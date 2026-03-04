@@ -132,8 +132,9 @@ class ConsoSAN(SensorEntity, CoordinatorEntity):
         try:
             _LOGGER.debug(
                 "In sensor.py SAN _handle_coordinator_update %s", self)
-            self._attr_native_value = self.coordinator.data[self.idx]["energy"]["SAN"]
-            self.async_write_ha_state()
+            if self.unique_id == "SAN"+self.IDChaudiere + str(9) and "energy" in self.coordinator.data[self.idx] and "SAN" in self.coordinator.data[self.idx]["energy"]:
+                self._attr_native_value = self.coordinator.data[self.idx]["energy"]["SAN"]
+                self.async_write_ha_state()
         except Exception as e:
             _LOGGER.error("Error in async_update SAN sensor: %s", e)
 
@@ -199,7 +200,7 @@ class ConsoCHF(SensorEntity, CoordinatorEntity):
             # self.coordinator.data = FrisquetConnectEntity.data
             _LOGGER.debug(
                 "In sensor.py CHF _handle_coordinator_update %s", self)
-            if self.unique_id == "CHF"+self.IDChaudiere + str(9):
+            if self.unique_id == "CHF"+self.IDChaudiere + str(9) and "energy" in self.coordinator.data[self.idx] and "CHF" in self.coordinator.data[self.idx]["energy"]:
                 self._attr_native_value = self.coordinator.data[self.idx]["energy"]["CHF"]
                 self.async_write_ha_state()
         except Exception as e:
