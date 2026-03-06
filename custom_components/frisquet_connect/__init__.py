@@ -18,6 +18,36 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER = logging.getLogger(__name__)
 
 
+async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+    _LOGGER.debug(
+        "Migrating from version %s.%s", config_entry.version, config_entry.minor_version
+    )
+
+    if config_entry.version == 1:
+        new_data = {**config_entry.data}
+
+        # Migration 1.2: Move credentials from zone1 to root if missing
+        if config_entry.minor_version < 2:
+            if "email" not in new_data or "password" not in new_data:
+                if "zone1" in new_data and isinstance(new_data["zone1"], dict):
+                    zone1_data = new_data["zone1"]
+                    if "email" in zone1_data and "password" in zone1_data:
+                        _LOGGER.info("Migration: Moving credentials from zone1 to root")
+                        new_data["email"] = zone1_data["email"]
+                        new_data["password"] = zone1_data["password"]
+            
+            hass.config_entries.async_update_entry(config_entry, data=new_data, minor_version=2)
+
+    _LOGGER.info(
+        "Migration to version %s.%s successful",
+        config_entry.version,
+        config_entry.minor_version,
+    )
+
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Création des entités à partir d'une configEntry"""
     _LOGGER.debug("In async_setup_entry __init__.py")
@@ -59,6 +89,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Charge les plateformes
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Enregistre le listener pour les changements d'options/data
+    entry.async_on_unload(entry.add_update_listener(update_listener))
 
     return True
 

@@ -1,5 +1,4 @@
 from .const import DOMAIN, ORDER_API, WS_API
-from .frisquetAPI import FrisquetGetInfo
 import logging
 from zoneinfo import ZoneInfo
 import aiohttp  # type: ignore
@@ -19,7 +18,6 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import (
     AddEntitiesCallback,
-    async_get_current_platform,
 
 )
 
@@ -29,7 +27,6 @@ from homeassistant.components.climate import (
 )
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
-    DataUpdateCoordinator,
 )
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession

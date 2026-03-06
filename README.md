@@ -34,7 +34,9 @@ _or_
 2- Restart HA and add the integration Frisquet connect from Device -> Add integration<br>
 3- Enter your Username and Password<br>
 
+### Configuration
 
+You can update your email and password at any time by clicking the "Configure" button on the integration page in Home Assistant.
 
 ## Features : Frisquet vs HA logic
 
