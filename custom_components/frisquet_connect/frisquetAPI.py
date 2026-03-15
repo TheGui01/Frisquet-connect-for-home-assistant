@@ -61,19 +61,28 @@ class FrisquetGetInfo:
         # --- Récupération du token ---
         # priorité
         token = self.data.get("token") or data.get("token")
+        identifiant = self.data.get("identifiant_chaudiere") or data.get("identifiant_chaudiere")
 
         # fallback : token persisté UNIQUEMENT au premier run
         if not token and not retry:
             token = entry.data.get("token") if entry else None
+            identifiant = entry.data.get("identifiant_chaudiere") if entry else None
 
         # --- Récupération des credentials ---
         email = entry.data.get("email") if entry else data.get("email")
         password = entry.data.get(
             "password") if entry else data.get("password")
 
+         # --- Récupération de l'identifiant chaudiere ---
+        #identifiant = None
+        if "sites" in data and site in data["sites"] is not None:
+            identifiant = data["sites"][site].get("identifiant_chaudiere")
+        elif "identifiant_chaudiere" in data is not None:
+            identifiant = data["identifiant_chaudiere"]
+
         auth_json_reply = None
 
-        if not token:
+        if not token or not identifiant:
             if not email or not password:
                 raise Exception(
                     "Frisquet: email/password requis pour ré-authentification"
@@ -85,6 +94,10 @@ class FrisquetGetInfo:
             if not token:
                 raise Exception("Frisquet API did not return a token")
 
+            if "sites" not in data:
+                data["sites"] = {}
+                data["sites"][site] = {"identifiant_chaudiere": identifiant}
+
             self.data["token"] = token
             data["token"] = token
 
@@ -95,9 +108,9 @@ class FrisquetGetInfo:
 
         # ID Chaufière
 
-        if auth_json_reply == None:
-            auth_json_reply = await self.api_auth(email, password)
-        identifiant = auth_json_reply["utilisateur"]["sites"][site]["identifiant_chaudiere"]
+        #if auth_json_reply == None:
+        #    auth_json_reply = await self.api_auth(email, password)
+        #identifiant = auth_json_reply["utilisateur"]["sites"][site]["identifiant_chaudiere"]
 
         if not identifiant:
             raise Exception(

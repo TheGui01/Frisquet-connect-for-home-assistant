@@ -163,6 +163,7 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
 
     @callback
     def _handle_coordinator_update(self) -> None:
+        _LOGGER.debug("In _handle_coordinator_update")
         data = self.coordinator.data[self.idx]
 
         self._attr_current_temperature = data["TAMB"] / 10
