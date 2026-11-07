@@ -21,8 +21,9 @@ jobs:
       - name: Create frisquet-connect.zip
         run: |
           cd custom_components/frisquet_connect
-          zip -r ../../../frisquet-connect.zip . -x "*.pyc" "__pycache__/*"
-          cd ../../..
+          zip -r ../../frisquet-connect.zip . -x "*.pyc" "__pycache__/*"
+          cd ../..
+          ls -l frisquet-connect.zip
 
       - name: Upload to release
         env:
