@@ -1,0 +1,89 @@
+name: Download stats
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  record-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect download stats
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: TheGui01/Frisquet-connect-for-home-assistant
+        run: |
+          mkdir -p stats
+          python3 - <<'EOF'
+          import json, os, subprocess, datetime, urllib.request
+
+          repo = os.environ["REPO"]
+          token = os.environ["GH_TOKEN"]
+          headers = {"Authorization": f"Bearer {token}",
+                     "Accept": "application/vnd.github+json"}
+
+          def api(url):
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req) as r:
+                  return json.load(r)
+
+          releases, page = [], 1
+          while True:
+              batch = api(f"https://api.github.com/repos/{repo}/releases?per_page=100&page={page}")
+              if not batch:
+                  break
+              releases.extend(batch)
+              page += 1
+
+          total_downloads = 0
+          per_asset = {}
+          for rel in releases:
+              for asset in rel.get("assets", []):
+                  count = asset.get("download_count", 0)
+                  total_downloads += count
+                  per_asset[asset["name"]] = count
+
+          try:
+              clones = api(f"https://api.github.com/repos/{repo}/traffic/clones")
+              clones_14d, clones_unique = clones.get("count", 0), clones.get("uniques", 0)
+          except Exception:
+              clones_14d, clones_unique = None, None
+
+          entry = {
+              "date": datetime.date.today().isoformat(),
+              "total_downloads": total_downloads,
+              "clones_last_14d": clones_14d,
+              "clones_unique_14d": clones_unique,
+              "assets": per_asset,
+          }
+
+          path = "stats/downloads-history.json"
+          history = []
+          if os.path.exists(path):
+              with open(path) as f:
+                  history = json.load(f)
+              history = [h for h in history if h["date"] != entry["date"]]
+          history.append(entry)
+          history.sort(key=lambda h: h["date"])
+
+          with open(path, "w") as f:
+              json.dump(history, f, indent=2, ensure_ascii=False)
+              f.write("\n")
+
+          print(f"{total_downloads} téléchargements cumulés, {len(per_asset)} assets trackés.")
+          EOF
+
+      - name: Commit history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stats/downloads-history.json
+          git diff --cached --quiet && echo "Rien à committer" && exit 0
+          git commit -m "chore(stats): mise à jour quotidienne des téléchargements [skip ci]"
+          git push
