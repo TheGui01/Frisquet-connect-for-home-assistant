@@ -8,6 +8,12 @@ from .const import AUTH_API, API_URL
 
 _LOGGER = logging.getLogger(__name__)
 
+class FrisquetAuthError(Exception):
+    """Erreur d'authentification."""
+
+class FrisquetApiError(Exception):
+    """Erreur API générique."""
+
 
 class FrisquetGetInfo:
     def __init__(self, hass, entry_data):
@@ -48,9 +54,10 @@ class FrisquetGetInfo:
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url=_AUTH_API, headers=headers, json=payload) as resp:
+                if resp.status == 403:
+                    raise FrisquetAuthError("Identifiants invalides")
                 if resp.status != 201:
-                    raise Exception(
-                        f"Authentification failed with http ({resp.status})")
+                    raise FrisquetApiError(f"Erreur HTTP {resp.status}")
                 return await resp.json()
 
     async def getTokenAndInfo(self, entry, data, idx, site, retry=False):

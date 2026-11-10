@@ -18,7 +18,16 @@
                 "title": "Plusieurs installations trouvées",
                 "description": "Sélectionnez le site"
             }
-        }
+        },
+        "error": {
+            "invalid_auth": "Identifiants incorrects : vérifiez votre e-mail et votre mot de passe Frisquet Connect.",
+            "cannot_connect": "Impossible de contacter le serveur Frisquet. Vérifiez votre connexion et réessayez.",
+            "unknown": "Erreur inattendue. Consultez les journaux de Home Assistant."
+        },
+        "abort": {
+            "already_configured": "Cette chaudière Frisquet est déjà configurée.",
+            "unknown": "Erreur inattendue. Consultez les journaux de Home Assistant."
+        }        
     },
     "entity": {
         "climate": {
