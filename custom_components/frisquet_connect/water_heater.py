@@ -47,7 +47,7 @@ class FrisquetWaterHeater(WaterHeaterEntity, CoordinatorEntity):
            coordinator.data["modes_ecs_"])
         self._attr_current_operation = self._frisquet_to_operation(
            coordinator.data["ecs"][idx]["id"], idx)
-        self._attr_temperature_unit = "°C"
+        self._attr_native_temperature_unit = "°C"
         # NEWOOD ADD :
         self.IDchaudiere =coordinator.data['zone1']['identifiant_chaudiere']
         self.token =coordinator.data['zone1']['token']

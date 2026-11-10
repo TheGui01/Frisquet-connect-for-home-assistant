@@ -113,5 +113,12 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         title = (sites[site] if sites else "Frisquet")
         payload["email"] = self.data["email"]
         payload["password"] = self.data["password"]
-        _LOGGER.debug("Config_Flow payload=%s", payload)
+        safe_payload = dict(payload)
+        if "password" in safe_payload:
+            safe_payload["password"] = "***REDACTED***"
+        if "token" in safe_payload:
+            safe_payload["token"] = "***REDACTED***"
+	
+        _LOGGER.debug("Config_Flow payload=%s", safe_payload)
+
         return self.async_create_entry(title=title, data=payload)
