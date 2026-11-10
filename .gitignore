@@ -35,7 +35,10 @@ home-assistant.log.fault
 .storage/core.uuid
 .storage/homeassistant.exposed_entities
 .storage/http
-.storage/http.auth
+config/.cloud
+config/.cache/brands
+config/.cache
+config/.storage
 .storage/onboarding
 .storage/person
 .storage/repairs.issue_registry
