@@ -138,6 +138,12 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             self._attr_preset_mode, self.coordinator.data[self.idx]["CONS_CONF"] / 10, self.coordinator.data[self.idx]["CONS_RED"] / 10, self.coordinator.data[self.idx]["CONS_HG"] / 10)
 
     @property
+    def extra_state_attributes(self) -> dict:
+        return {
+        "programmation": self.coordinator.data[self.idx].get("programmation", [])
+        }
+
+    @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
