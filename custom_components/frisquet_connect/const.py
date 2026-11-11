@@ -4,7 +4,7 @@ from homeassistant.const import Platform
 from enum import IntFlag, StrEnum
 DOMAIN = "frisquet_connect"
 PLATFORMS: list[Platform] = [Platform.CLIMATE,
-                             Platform.SENSOR, Platform.WATER_HEATER
+                             Platform.SENSOR, Platform.WATER_HEATER, Platform.CALENDAR
                              ]
 
 AUTH_API = "https://fcutappli.frisquet.com/api/v1/authentifications"
