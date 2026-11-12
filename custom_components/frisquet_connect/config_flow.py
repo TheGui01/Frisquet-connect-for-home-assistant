@@ -177,12 +177,12 @@ class FrisquetConfigFlow(ConfigFlow, domain=DOMAIN):
         payload["email"] = self.data["email"]
         payload["password"] = self.data["password"]
 
-        safe_payload = dict(payload)
-        if "password" in safe_payload:
-            safe_payload["password"] = "***REDACTED***"
-        if "token" in safe_payload:
-            safe_payload["token"] = "***REDACTED***"
-
-        _LOGGER.debug("Config_Flow payload=%s", safe_payload)
+        _LOGGER.debug(
+            "Config_Flow payload prepared (site=%s, has_token=%s, has_identifiant_chaudiere=%s, has_zone1=%s)",
+            payload.get("SiteID"),
+            bool(payload.get("token")),
+            bool(payload.get("identifiant_chaudiere")),
+            "zone1" in payload,
+        )
 
         return self.async_create_entry(title=title, data=payload)
