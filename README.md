@@ -15,25 +15,23 @@
 
 ## Installation
 
-### HACS
+### Marketplace (Ex HACS)
 
-Frisquet connect is available in HACS (Home Assistant Community Store).
+Frisquet connect is available in Marketplace (Ex HACS).
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thegui01&repository=Frisquet-connect-for-home-assistant)
 
 _or_
 
-1. Install HACS if you don't have it already
-2. Open HACS in Home Assistant
-3. Search for "Frisquet"
-4. Click the download button. ⬇️
+1. Go to Settings -> Marketplace
+2. Search for "Frisquet"
+3. Click the download button. ⬇️
 
 ### local install
 
 1- Copy the folder frisquet_connect into your custom_components folder<br>
 2- Restart HA and add the integration Frisquet connect from Device -> Add integration<br>
 3- Enter your Username and Password<br>
-
 
 
 ## Features : Frisquet vs HA logic
@@ -62,3 +60,15 @@ Please consider that values you will get will have 1 day offset : HA will record
 If you want more accurate values and you have a Gazpar Gas meter (France), I recommend you to see those 2 videos below :<br>
 https://youtu.be/YMdMFE2ysZE?si=W_hLeRye67dGsnlm  &  https://youtu.be/mjTrnnkuIUk?si=RKshhFiMmjamkC3i This setup allows to have accurate data that will be recorded for every 30 minutes in your energy dashboard. You can also track instant consumption with a derivative sensor.
 
+## frisquet-schedule-card
+You can now display the scheduling of the week and see range of each cycle reduit/confort
+
+### Install
+1- Go in Settins -> Marketplace -> personal repositories :<br>
+2- Add the repository : https://github.com/TheGui01/frisquet-schedule-card<br>
+3- Look for Frisquet Schedule card in the Marketplace and install it<br>
+4- In your dashboard you can then insert your card like below:<br>
+```yaml
+type: custom:frisquet-schedule-card
+entity: climate.maison_zone_1
+```
