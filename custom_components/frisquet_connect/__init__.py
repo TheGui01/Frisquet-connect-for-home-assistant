@@ -60,6 +60,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Charge les plateformes
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    from .service import async_setup_services
+    await async_setup_services(hass)
+
     return True
 
 
@@ -80,6 +83,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     else:
         _LOGGER.error(
             "Échec du déchargement des plateformes pour l'entrée {entry.entry_id}")
+
+    if not hass.data.get(DOMAIN):
+        hass.services.async_remove(DOMAIN, "set_programmation")
+        
     return unload_ok
 
 

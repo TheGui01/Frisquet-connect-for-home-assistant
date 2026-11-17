@@ -37,3 +37,6 @@ custom_components/frisquet_connect/__pycache__/*
 .storage/http.auth
 .storage/marketplace.common
 .storage/marketplace.repositories
+.storage/http.auth
+.storage/marketplace.common
+.storage/marketplace.repositories

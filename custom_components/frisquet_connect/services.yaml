@@ -1,0 +1,27 @@
+set_programmation:
+  name: Définir la programmation
+  description: >-
+    Envoie la programmation hebdomadaire d'une zone à l'API Frisquet
+    (ordre PROGRAMME_{zone}). La confirmation revient via la WebSocket
+    de l'intégration.
+  fields:
+    entity_id:
+      name: Entité
+      description: Entité climate de la zone à programmer.
+      required: true
+      example: climate.frisquet_zone_1
+      selector:
+        entity:
+          integration: frisquet_connect
+          domain: climate
+    programmation:
+      name: Programmation
+      description: >-
+        Liste des jours. "jour" : 0 (dimanche) à 6 (samedi).
+        "plages" : 48 valeurs 0/1, une par créneau de 30 minutes
+        (index 0 = 00h00-00h30, index 47 = 23h30-00h00, 1 = Confort).
+      required: true
+      example: >-
+        [{"jour": 1, "plages": [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}]
+      selector:
+        object:
