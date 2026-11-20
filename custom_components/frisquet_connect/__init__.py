@@ -1,7 +1,12 @@
 """Initialisation du package de l'intégration Frisquet Connect"""
+from .frisquetAPI import FrisquetGetInfo
+from homeassistant.components.http import StaticPathConfig
 import logging
+
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
+
 import asyncio
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, Event, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import timedelta
@@ -9,7 +14,11 @@ from .const import (
     DOMAIN,
     PLATFORMS,
 )
-from .frisquetAPI import FrisquetGetInfo
+from pathlib import Path
+CARD_URL = "/frisquet_connect/frisquet-schedule-card.js"
+CARD_PATH = Path(__file__).parent / "www" / "frisquet-schedule-card.js"
+# from homeassistant.components.frontend import async_register_extra_module_url
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,8 +28,72 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Création des entités à partir d'une configEntry"""
+    """Création des entités à partir d'une configEntry."""
     _LOGGER.debug("In async_setup_entry __init__.py")
+
+    await hass.http.async_register_static_paths(
+        [
+            StaticPathConfig(
+                url_path=CARD_URL,
+                path=str(CARD_PATH),
+                cache_headers=False,
+            )
+        ]
+    )
+
+    @callback
+    def _async_register_schedule_card_resource(event: Event) -> None:
+        """Enregistre la ressource Lovelace après le démarrage de HA."""
+
+        lovelace_data = hass.data.get("lovelace")
+
+        if not lovelace_data:
+            _LOGGER.warning(
+                "Lovelace n'est pas disponible : la carte Frisquet doit être "
+                "ajoutée manuellement dans les ressources du tableau de bord."
+            )
+            return
+
+        resources = getattr(lovelace_data, "resources", None)
+
+        if resources is None:
+            _LOGGER.warning(
+                "Le gestionnaire de ressources Lovelace n'est pas disponible : "
+                "la carte Frisquet doit être ajoutée manuellement."
+            )
+            return
+
+        existing_urls = {
+            resource.get("url")
+            for resource in resources.async_items()
+            if resource.get("url")
+        }
+
+        if CARD_URL in existing_urls:
+            _LOGGER.debug(
+                "La ressource Lovelace %s est déjà enregistrée.",
+                CARD_URL,
+            )
+            return
+
+        hass.async_create_task(
+            resources.async_create_item(
+                {
+                    "res_type": "module",
+                    "url": CARD_URL,
+                }
+            )
+        )
+
+        _LOGGER.info(
+            "Ressource Lovelace %s enregistrée pour la carte Frisquet.",
+            CARD_URL,
+        )
+
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        _async_register_schedule_card_resource,
+    )
 
     my_api = FrisquetGetInfo(hass, entry.data)
 
@@ -73,8 +146,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload_ok:
-        if DOMAIN in hass.data and entry.entry_id  in hass.data[DOMAIN]:
-            hass.data[DOMAIN].pop(entry.entry_id )
+        if DOMAIN in hass.data and entry.entry_id in hass.data[DOMAIN]:
+            hass.data[DOMAIN].pop(entry.entry_id)
             _LOGGER.debug(
                 "Données de l'entrée {entry.entry_id} supprimées de hass.data[{DOMAIN}]")
         else:
@@ -86,7 +159,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     if not hass.data.get(DOMAIN):
         hass.services.async_remove(DOMAIN, "set_programmation")
-        
+
     return unload_ok
 
 

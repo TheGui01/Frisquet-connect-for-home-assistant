@@ -16,7 +16,45 @@ home-assistant_v2.db-shm
 home-assistant_v2.db-wal
 home-assistant.log.fault
 config/.cloud
-config/.storage/*
+config/.storage/*# Environnements virtuels Python
+.venv/
+venv/
+
+# Fichiers Python générés
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Caches des outils de développement
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Variables d'environnement et secrets locaux
+.env
+.env.*
+!.env.example
+
+# Données de l'instance Home Assistant de test
+/config/.storage/
+/config/.cloud/
+/config/.HA_VERSION
+/config/home-assistant.log*
+/config/home-assistant_v2.db*
+/config/secrets.yaml
+/config/deps/
+/config/tts/
+
+# Fichiers système et temporaires
+.DS_Store
+Thumbs.db
+*.swp
+*~
 config/.cache/brands
 .storage/onboarding
 .storage/person
@@ -40,3 +78,7 @@ custom_components/frisquet_connect/__pycache__/*
 .storage/http.auth
 .storage/marketplace.common
 .storage/marketplace.repositories
+.storage/http.auth
+.storage/marketplace.repositories
+.storage/marketplace.common
+.gitignore

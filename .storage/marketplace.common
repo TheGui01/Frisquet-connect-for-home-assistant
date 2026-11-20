@@ -4,7 +4,24 @@
   "key": "marketplace.common",
   "data": {
     "archived_repositories": [],
-    "renamed_repositories": {},
+    "renamed_repositories": {
+      "mattshax/plantsense-ha-card": "scietas/plantsense-ha-card",
+      "timosec/Satel-BeWave-Virtual-IP-Device": "timosec/BeWave",
+      "dellzhui/ha-birdie": "Birdie-Scandinavia-ApS/ha-birdie",
+      "mattshax/plantsense-ha-integration": "scietas/plantsense-ha-integration",
+      "stevene1919/hisense_vidaa": "stevene1919/vidaa",
+      "bisman-automations/ha-appliance-live-activity": "bisman-automations/ha-appliance-mgmt",
+      "Anonymouse0104/ha-brandweerrooster": "anonymouse-labs/ha-brandweerrooster",
+      "Kraken-Labz/octopus-media-card": "KoboLab/octopus-media-card",
+      "embersas/moisture-loop": "VicRaster/moisture-loop",
+      "davideguida0093/drivepulse-home-assistant": "davidedrivepulse/drivepulse-home-assistant",
+      "Anonymouse0104/ha-rwm-afval": "anonymouse-labs/ha-rwm-afval",
+      "jasonmx/device-side": "DeviceSide/DeviceSide",
+      "Anonymouse0104/ha-workout-buddy": "anonymouse-labs/ha-workout-buddy",
+      "odya/hass-ina219-ups-hat": "odya-kun/hass-ina219-ups-hat",
+      "silvanfischer/tuya_sensors": "fischsil/tuya_sensors",
+      "Looking4Cache/home-assistant-remote-assistant": "remote-red/home-assistant-remote-assistant"
+    },
     "ignored_repositories": [],
     "custom_repositories": []
   }
