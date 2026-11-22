@@ -123,6 +123,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         update_interval=timedelta(minutes=15),
     )
 
+    # Accès au cache de l'API (utilisé par number.py après un ordre)
+    coordinator.frisquet_api = my_api
+
     # Stocke le coordinator avec entry.entry_id
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator

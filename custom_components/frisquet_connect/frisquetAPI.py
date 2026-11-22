@@ -268,3 +268,13 @@ class FrisquetGetInfo:
     def generer_Appid_random(self, longueur=22):
         caracteres = string.ascii_letters + string.digits
         return ''.join(random.choice(caracteres) for _ in range(longueur))
+
+    def set_cached_value(self, zone_key, key, value):
+        """Met à jour une valeur de zone dans le cache (après un ordre envoyé).
+
+        Évite qu'un rafraîchissement dans les 15 minutes du cache ne renvoie
+        l'ancienne valeur.
+        """
+        for cache in (self.data, self.previousdata):
+            if zone_key in cache:
+                cache[zone_key][key] = value
