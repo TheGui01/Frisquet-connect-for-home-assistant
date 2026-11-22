@@ -1,0 +1,41 @@
+name: Vérifier la version de la release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      # Pour un événement "release", checkout récupère le commit du tag
+      - uses: actions/checkout@v4
+
+      - name: Comparer manifest.json et le tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          TAG_VERSION="${TAG#v}"
+          MANIFEST_VERSION="$(jq -r '.version' manifest.json)"
+
+          echo "Tag de la release : $TAG_VERSION"
+          echo "Version du manifest : $MANIFEST_VERSION"
+
+          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "::error file=manifest.json::La version du manifest ($MANIFEST_VERSION) ne correspond pas au tag ($TAG_VERSION)."
+            exit 1
+          fi
+
+          echo "OK : les versions correspondent."
+
+      # Si la vérification échoue, on repasse la release en brouillon
+      # pour qu'elle ne soit plus visible publiquement.
+      - name: Repasser la release en brouillon
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release edit "$TAG" --draft --repo "$GITHUB_REPOSITORY"
