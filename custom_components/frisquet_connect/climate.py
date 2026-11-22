@@ -428,6 +428,39 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
         except Exception as e:
             _LOGGER.error("Erreur dans websocket_confirmation : %s", e)
 
+    def _reflect_order(self, key: str, valeur: int) -> None:
+        """Reporte un ordre accepté dans les données du coordinator.
+
+        Sans cela, SELECTEUR / DERO / consignes restent à leur ancienne
+        valeur jusqu'à la prochaine lecture de l'API (cache de 15 min) :
+        l'entité climate et les entités number affichaient l'ancienne
+        consigne après un changement.
+        """
+        data = self.coordinator.data.get(self.idx)
+        if data is None:
+            return
+        valeurs = {}
+        if key.startswith("SELECTEUR_Z"):
+            valeurs = {"SELECTEUR": valeur, "DERO": False}
+            if valeur in (6, 7, 8):
+                valeurs["MODE"] = valeur
+        elif key == "MODE_DERO":
+            valeurs = {"DERO": valeur != 0}
+            if valeur != 0:
+                valeurs["MODE"] = valeur
+        elif key.startswith(("CONS_CONF_Z", "CONS_RED_Z", "CONS_HG_Z")):
+            valeurs = {key.rsplit("_Z", 1)[0]: valeur}
+        elif key.startswith("ACTIVITE_BOOST_Z"):
+            valeurs = {"ACTIVITE_BOOST": valeur == 1}
+        if not valeurs:
+            return
+        api = getattr(self.coordinator, "frisquet_api", None)
+        for cle, value in valeurs.items():
+            data[cle] = value
+            if api is not None:
+                api.set_cached_value(self.idx, cle, value)
+        self.coordinator.async_update_listeners()
+
     async def OrderToFrisquestAPI(self, key, valeur):
         if key == "MODE_ECS":
             idx = "zone1"
@@ -463,6 +496,9 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             _LOGGER.debug("In OrderToFrisquestAPI resp :'%s", json_data)
             await _session.close()
             self.TimeLastOrder = time.time()
+            # water_heater.py appelle aussi cette méthode avec sa propre instance.
+            if resp.status in (200, 201) and isinstance(self, FrisquetConnectEntity):
+                self._reflect_order(key, int(valeur))
 
 
         asyncio.create_task(FrisquetConnectEntity.websocket_confirmation(self))
