@@ -1,8 +1,9 @@
-"""Service frisquet_connect.set_programmation.
+"""Services frisquet_connect.set_programmation et set_hors_gel.
 
-Envoie l'ordre PROGRAMME_{zone} à l'API Frisquet depuis Home Assistant.
-Appelé par la carte frisquet-schedule-card (ou manuellement via
-Outils de développement > Actions).
+set_programmation envoie l'ordre PROGRAMME_{zone} à l'API Frisquet ;
+set_hors_gel enregistre les plages Hors gel gardées par Home Assistant
+(voir hors_gel.py). Appelés par la carte frisquet-schedule-card (ou
+manuellement via Outils de développement > Actions).
 
 Installation (3 fichiers / ajouts) :
 
@@ -51,6 +52,12 @@ PROGRAMMATION_SCHEMA = vol.Schema({
         }, extra=vol.ALLOW_EXTRA)],
         vol.Length(min=1, max=7),
     ),
+})
+
+
+HORS_GEL_SCHEMA = vol.Schema({
+    vol.Required("entity_id"): str,
+    vol.Required("hors_gel"): PROGRAMMATION_SCHEMA.schema[vol.Required("programmation")],
 })
 
 
@@ -118,6 +125,37 @@ async def async_send_order(hass: HomeAssistant, entry, coordinator, zone_key: st
         )
 
 
+def _resolve_zone(hass: HomeAssistant, entity_id: str):
+    """Entrée de configuration, coordinator et zone d'une entité climate."""
+    # 1. Retrouver l'entrée de configuration via le registre d'entités.
+    registry = er.async_get(hass)
+    reg_entry = registry.async_get(entity_id)
+    if reg_entry is None or not reg_entry.config_entry_id:
+        raise HomeAssistantError(f"Entité inconnue : {entity_id}")
+    entry = hass.config_entries.async_get_entry(reg_entry.config_entry_id)
+    if entry is None:
+        raise HomeAssistantError(f"ConfigEntry introuvable pour {entity_id}")
+
+    coordinator = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if coordinator is None:
+        raise HomeAssistantError("Intégration Frisquet non initialisée")
+
+    # 2. Identifier la zone : unique_id = identifiant_chaudiere + numero
+    #    (même construction que dans climate.py).
+    unique_id = reg_entry.unique_id or ""
+    zone_key, zone_data = None, None
+    for key in ("zone1", "zone2", "zone3"):
+        zd = (coordinator.data or {}).get(key)
+        if not zd:
+            continue
+        if str(zd.get("identifiant_chaudiere")) + str(zd.get("numero")) == unique_id:
+            zone_key, zone_data = key, zd
+            break
+    if zone_data is None:
+        raise HomeAssistantError(f"Zone introuvable pour {entity_id}")
+    return entry, coordinator, zone_key, zone_data
+
+
 async def async_setup_services(hass: HomeAssistant) -> None:
     if hass.services.has_service(DOMAIN, "set_programmation"):
         return
@@ -126,33 +164,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         data = PROGRAMMATION_SCHEMA(dict(call.data))
         entity_id = data["entity_id"]
         programmation = _normalize(data["programmation"])
-
-        # 1. Retrouver l'entrée de configuration via le registre d'entités.
-        registry = er.async_get(hass)
-        reg_entry = registry.async_get(entity_id)
-        if reg_entry is None or not reg_entry.config_entry_id:
-            raise HomeAssistantError(f"Entité inconnue : {entity_id}")
-        entry = hass.config_entries.async_get_entry(reg_entry.config_entry_id)
-        if entry is None:
-            raise HomeAssistantError(f"ConfigEntry introuvable pour {entity_id}")
-
-        coordinator = hass.data.get(DOMAIN, {}).get(entry.entry_id)
-        if coordinator is None:
-            raise HomeAssistantError("Intégration Frisquet non initialisée")
-
-        # 2. Identifier la zone : unique_id = identifiant_chaudiere + numero
-        #    (même construction que dans climate.py).
-        unique_id = reg_entry.unique_id or ""
-        zone_key, zone_data = None, None
-        for key in ("zone1", "zone2", "zone3"):
-            zd = (coordinator.data or {}).get(key)
-            if not zd:
-                continue
-            if str(zd.get("identifiant_chaudiere")) + str(zd.get("numero")) == unique_id:
-                zone_key, zone_data = key, zd
-                break
-        if zone_data is None:
-            raise HomeAssistantError(f"Zone introuvable pour {entity_id}")
+        entry, coordinator, zone_key, zone_data = _resolve_zone(hass, entity_id)
 
         zone_identifiant = zone_data.get("identifiant")  # ex. "Z1"
         if not zone_identifiant:
@@ -167,11 +179,27 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         }]
         await async_send_order(hass, entry, coordinator, zone_key, order)
 
-        # 4. Forcer une mise à jour pour que l'entité (et la carte)
-        # reflètent la nouvelle programmation sans attendre les 15 min.
-        await coordinator.async_request_refresh()
+        # 4. Appliquer la programmation localement (et dans le cache de 15 min
+        # de l'API) pour que l'entité et la carte la reflètent tout de suite.
+        coordinator.data[zone_key]["programmation"] = programmation
+        api = getattr(coordinator, "frisquet_api", None)
+        if api is not None:
+            api.set_cached_value(zone_key, "programmation", programmation)
+        coordinator.async_update_listeners()
+
+    async def handle_set_hors_gel(call: ServiceCall) -> None:
+        data = HORS_GEL_SCHEMA(dict(call.data))
+        _entry, coordinator, zone_key, _zone_data = _resolve_zone(hass, data["entity_id"])
+        hors_gel = getattr(coordinator, "frisquet_hors_gel", None)
+        if hors_gel is None:
+            raise HomeAssistantError("Plages Hors gel non initialisées")
+        await hors_gel.async_set(zone_key, _normalize(data["hors_gel"]))
 
     hass.services.async_register(
         DOMAIN, "set_programmation", handle_set_programmation,
         schema=PROGRAMMATION_SCHEMA,
+    )
+    hass.services.async_register(
+        DOMAIN, "set_hors_gel", handle_set_hors_gel,
+        schema=HORS_GEL_SCHEMA,
     )

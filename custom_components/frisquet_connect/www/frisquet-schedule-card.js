@@ -2,21 +2,38 @@
  * Frisquet Schedule Card — frise hebdomadaire interactive.
  *
  * Lecture : plages Confort / Réduit de l'attribut `programmation`
- * de l'entité climate (jour 0 = dimanche ... 6 = samedi, 48 créneaux de 30 min).
+ * de l'entité climate (jour 0 = dimanche ... 6 = samedi, 48 créneaux de 30 min),
+ * et plages Hors gel de l'attribut `hors_gel` (même format, 1 = Hors gel)
+ * quand l'intégration le fournit.
  *
- * Édition : bouton « Modifier » -> clic pour basculer un créneau,
- * glissement pour peindre, « Enregistrer » -> appelle le service
- * (par défaut frisquet_connect.set_programmation) qui envoie
- * l'ordre PROGRAMME_{zone} à l'API Frisquet.
+ * Édition : bouton « Modifier » -> choix du pinceau (Confort, Réduit,
+ * Hors gel), clic pour peindre un créneau, glissement pour peindre,
+ * « Enregistrer » -> appelle le service (par défaut
+ * frisquet_connect.set_programmation) qui envoie l'ordre PROGRAMME_{zone}
+ * à l'API Frisquet, puis frisquet_connect.set_hors_gel pour les plages
+ * Hors gel (gardées par Home Assistant, Réduit dans la chaudière).
  *
  * Configuration :
  *   entity: climate.xxx                     (obligatoire)
  *   service: frisquet_connect.set_programmation (optionnel)
- *   title / confort_color / reduit_color    (optionnel)
+ *   title / confort_color / reduit_color / hors_gel_color (optionnel)
  */
 
 const DEFAULT_CONFORT_COLOR = "#ff5252";
 const DEFAULT_REDUIT_COLOR = "#42a5f5";
+const DEFAULT_HORS_GEL_COLOR = "#90a4ae";
+
+// Valeur d'un créneau : 0 = Réduit, 1 = Confort, 2 = Hors gel.
+const STATES = {
+  0: { name: "Réduit", cls: "reduit" },
+  1: { name: "Confort", cls: "confort" },
+  2: { name: "Hors gel", cls: "horsgel" },
+};
+
+function slotValue(value) {
+  const number = Number(value);
+  return number === 1 || number === 2 ? number : 0;
+}
 
 const DAY_NAMES = {
   0: "Dimanche",
@@ -34,6 +51,7 @@ const CARD_STYLES = `
   :host {
   --frisquet-confort-color: #ff5252;
   --frisquet-reduit-color: #42a5f5;
+  --frisquet-horsgel-color: #90a4ae;
   }
 
   ha-card {
@@ -83,6 +101,11 @@ const CARD_STYLES = `
   .slot.confort,
   .blk.confort {
     background: var(--frisquet-confort-color);
+  }
+
+  .slot.horsgel,
+  .blk.horsgel {
+    background: var(--frisquet-horsgel-color);
   }
 
   .slot.reduit,
@@ -206,6 +229,10 @@ const CARD_STYLES = `
     background: var(--frisquet-reduit-color);
   }
 
+  .range.horsgel::before {
+    background: var(--frisquet-horsgel-color);
+  }
+
   .dot {
     display: inline-block;
     width: 10px;
@@ -221,6 +248,22 @@ const CARD_STYLES = `
 
   .dot.reduit {
     background: var(--frisquet-reduit-color);
+  }
+
+  .dot.horsgel {
+    background: var(--frisquet-horsgel-color);
+  }
+
+  .brushes {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .btn.brush.active {
+    border-color: var(--primary-color, #03a9f4);
+    box-shadow: inset 0 0 0 1px var(--primary-color, #03a9f4);
+    font-weight: 600;
   }
 
   .actions {
@@ -324,6 +367,8 @@ class FrisquetScheduleCard extends HTMLElement {
     this._optimistic = null;
     this._painting = false;
     this._paintValue = null;
+    this._brush = 1;
+    this._supportsHorsGel = false;
     this._renderRoot = this.attachShadow({ mode: "open" });
 
     this._render();
@@ -391,7 +436,7 @@ class FrisquetScheduleCard extends HTMLElement {
     return JSON.stringify(first) === JSON.stringify(second);
   }
 
-  _initEditBuffer(programmation) {
+  _initEditBuffer(programmation, horsGel) {
     const days = Array.from({ length: 7 }, () => new Array(48).fill(0));
 
     if (Array.isArray(programmation)) {
@@ -426,7 +471,45 @@ class FrisquetScheduleCard extends HTMLElement {
       }
     }
 
+    // Les plages Hors gel (48 créneaux) priment sur Confort / Réduit.
+    if (Array.isArray(horsGel)) {
+      for (const day of horsGel) {
+        const dayIndex = ((Number(day.jour) % 7) + 7) % 7;
+        const ranges = Array.isArray(day.plages) ? day.plages : [];
+
+        for (let slot = 0; slot < 48 && slot < ranges.length; slot++) {
+          if (Number(ranges[slot]) === 1) {
+            days[dayIndex][slot] = 2;
+          }
+        }
+      }
+    }
+
     this._edit = { data: days, dirty: false };
+  }
+
+  // Programmation et plages Hors gel à afficher (envoi en attente compris).
+  _currentData(stateObject) {
+    let programmation = stateObject.attributes?.programmation;
+    let horsGel = stateObject.attributes?.hors_gel;
+
+    // Affichage optimiste : tant que l'entité n'a pas rattrapé ce qui a été
+    // envoyé, on affiche ce qui a été envoyé.
+    if (this._optimistic) {
+      const caughtUp =
+        this._sameProg(programmation, this._optimistic.programmation) &&
+        (!this._optimistic.horsGel ||
+          this._sameProg(horsGel, this._optimistic.horsGel));
+
+      if (caughtUp) {
+        this._optimistic = null;
+      } else {
+        programmation = this._optimistic.programmation;
+        horsGel = this._optimistic.horsGel || horsGel;
+      }
+    }
+
+    return { programmation, horsGel };
   }
 
   // ---------------------------------------------------------------- rendu
@@ -443,17 +526,8 @@ class FrisquetScheduleCard extends HTMLElement {
       return;
     }
 
-    let programmation = stateObject.attributes?.programmation;
-
-    // Affichage optimiste : tant que l'entité n'a pas rattrapé la programmation
-    // envoyée, on affiche ce qui a été envoyé.
-    if (this._optimistic) {
-      if (this._sameProg(programmation, this._optimistic)) {
-        this._optimistic = null;
-      } else {
-        programmation = this._optimistic;
-      }
-    }
+    this._supportsHorsGel = Array.isArray(stateObject.attributes?.hors_gel);
+    let { programmation, horsGel } = this._currentData(stateObject);
 
     if (!this._editMode && (!Array.isArray(programmation) || !programmation.length)) {
       this._renderError(
@@ -474,6 +548,17 @@ class FrisquetScheduleCard extends HTMLElement {
 
     card.style.setProperty("--frisquet-confort-color", confortColor);
     card.style.setProperty("--frisquet-reduit-color", reduitColor);
+    card.style.setProperty(
+      "--frisquet-horsgel-color",
+      safeColor(this.config.hors_gel_color, DEFAULT_HORS_GEL_COLOR)
+    );
+
+    // Avec des plages Hors gel, on affiche la fusion des deux sur 48 créneaux.
+    if (!this._editMode && this._supportsHorsGel) {
+      this._initEditBuffer(programmation, horsGel);
+      programmation = this._edit.data.map((plages, jour) => ({ jour, plages }));
+      this._edit = null;
+    }
     if (this.config.title) {
       card.appendChild(
         createElement("div", "title", this.config.title)
@@ -550,13 +635,10 @@ class FrisquetScheduleCard extends HTMLElement {
     let lastChangePosition = -100;
 
     while (index < ranges.length) {
-      const value = Number(ranges[index]) === 1 ? 1 : 0;
+      const value = slotValue(ranges[index]);
       let end = index;
 
-      while (
-        end < ranges.length &&
-        (Number(ranges[end]) === 1 ? 1 : 0) === value
-      ) {
+      while (end < ranges.length && slotValue(ranges[end]) === value) {
         end++;
       }
 
@@ -565,8 +647,8 @@ class FrisquetScheduleCard extends HTMLElement {
       const startTime = formatTime(index * intervalStepMinutes);
       const endTime =
         end >= total ? "24:00" : formatTime(end * intervalStepMinutes);
-      const stateName = value === 1 ? "Confort" : "Réduit";
-      const stateClass = value === 1 ? "confort" : "reduit";
+      const stateName = STATES[value].name;
+      const stateClass = STATES[value].cls;
 
       if (this._editMode) {
         const range = createElement(
@@ -654,6 +736,13 @@ class FrisquetScheduleCard extends HTMLElement {
     legend.appendChild(confort);
     legend.appendChild(reduit);
 
+    if (this._supportsHorsGel) {
+      const horsGel = createElement("span");
+      horsGel.appendChild(createElement("span", "dot horsgel"));
+      horsGel.appendChild(document.createTextNode("Hors gel"));
+      legend.appendChild(horsGel);
+    }
+
     return legend;
   }
 
@@ -674,12 +763,28 @@ class FrisquetScheduleCard extends HTMLElement {
       cancelButton.id = "btn-cancel";
       cancelButton.type = "button";
 
+      const brushes = createElement("div", "brushes");
+      const brushValues = this._supportsHorsGel ? [1, 0, 2] : [1, 0];
+
+      for (const value of brushValues) {
+        const brush = createElement(
+          "button",
+          `btn brush ${STATES[value].cls}${this._brush === value ? " active" : ""}`
+        );
+        brush.type = "button";
+        brush.dataset.brush = String(value);
+        brush.appendChild(createElement("span", `dot ${STATES[value].cls}`));
+        brush.appendChild(document.createTextNode(STATES[value].name));
+        brushes.appendChild(brush);
+      }
+
       const hint = createElement(
         "span",
         "hint",
-        "Cliquez pour basculer un créneau · glissez pour peindre (30 min)"
+        "Choisissez un pinceau · cliquez ou glissez pour peindre (30 min)"
       );
 
+      actions.appendChild(brushes);
       actions.appendChild(saveButton);
       actions.appendChild(cancelButton);
       actions.appendChild(hint);
@@ -729,10 +834,9 @@ class FrisquetScheduleCard extends HTMLElement {
     if (editButton) {
       editButton.addEventListener("click", () => {
         const stateObject = this._getEntity();
-        const programmation =
-          this._optimistic || stateObject?.attributes?.programmation;
+        const { programmation, horsGel } = this._currentData(stateObject);
 
-        this._initEditBuffer(programmation);
+        this._initEditBuffer(programmation, horsGel);
         this._editMode = true;
         this._status = null;
         this._painting = false;
@@ -753,6 +857,13 @@ class FrisquetScheduleCard extends HTMLElement {
         this._render();
       });
     }
+
+    root.querySelectorAll(".btn.brush").forEach((button) => {
+      button.addEventListener("click", () => {
+        this._brush = Number(button.dataset.brush);
+        this._render();
+      });
+    });
 
     const saveButton = root.querySelector("#btn-save");
 
@@ -806,84 +917,6 @@ class FrisquetScheduleCard extends HTMLElement {
   }
 
   _paintSlot(track, event) {
-    if (!this._edit) {
-      return;
-    }
-
-    const day = Number(track.dataset.day);
-
-    if (!Number.isInteger(day) || day < 0 || day > 6) {
-      return;
-    }
-
-    const rect = track.getBoundingClientRect();
-
-    if (!rect.width) {
-      return;
-    }
-
-    const ratio = Math.min(
-      0.9999,
-      Math.max(0, (event.clientX - rect.left) / rect.width)
-    );
-    const index = Math.floor(ratio * 48);
-
-    if (index < 0 || index > 47) {
-      return;
-    }
-
-    if (this._paintValue === null) {
-      this._paintValue = this._edit.data[day][index] === 1 ? 0 : 1;
-    }
-
-    if (this._edit.data[day][index] !== this._paintValue) {
-      this._edit.data[day][index] = this._paintValue;
-      this._edit.dirty = true;
-      this._updateTrackVisual(track, day);
-    }
-  }
-
-  _updateTrackVisual(track, day) {
-    if (!this._edit) {
-      return;
-    }
-
-    const ranges = this._edit.data[day];
-    const fragment = document.createDocumentFragment();
-
-    fragment.appendChild(createElement("div", "track-bg"));
-
-    let index = 0;
-
-    while (index < ranges.length) {
-      const value = Number(ranges[index]) === 1 ? 1 : 0;
-      let end = index;
-
-      while (
-        end < ranges.length &&
-        (Number(ranges[end]) === 1 ? 1 : 0) === value
-      ) {
-        end++;
-      }
-
-      const slot = createElement(
-        "div",
-        `slot ${value === 1 ? "confort" : "reduit"}`
-      );
-
-      slot.dataset.day = String(day);
-      slot.dataset.index = String(index);
-      slot.style.left = `${(index / 48) * 100}%`;
-      slot.style.width = `${((end - index) / 48) * 100}%`;
-
-      fragment.appendChild(slot);
-      index = end;
-    }
-
-    track.replaceChildren(fragment);
-  }
-
-  _paintSlot(track, event) {
     const day = Number(track.dataset.day);
 
     if (!Number.isInteger(day) || day < 0 || day > 6 || !this._edit) {
@@ -902,7 +935,11 @@ class FrisquetScheduleCard extends HTMLElement {
     }
 
     if (this._paintValue === null) {
-      this._paintValue = this._edit.data[day][index] === 1 ? 0 : 1;
+      // Peindre avec le pinceau ; sur un créneau déjà de cette couleur,
+      // le premier clic l'efface (Confort <-> Réduit, Hors gel -> Réduit).
+      const current = this._edit.data[day][index];
+      this._paintValue =
+        current !== this._brush ? this._brush : this._brush === 0 ? 1 : 0;
     }
 
     if (this._edit.data[day][index] !== this._paintValue) {
@@ -920,20 +957,14 @@ class FrisquetScheduleCard extends HTMLElement {
     let index = 0;
 
     while (index < ranges.length) {
-      const value = Number(ranges[index]) === 1 ? 1 : 0;
+      const value = slotValue(ranges[index]);
       let end = index;
 
-      while (
-        end < ranges.length &&
-        (Number(ranges[end]) === 1 ? 1 : 0) === value
-      ) {
+      while (end < ranges.length && slotValue(ranges[end]) === value) {
         end++;
       }
 
-      const slot = createElement(
-        "div",
-        `slot ${value === 1 ? "confort" : "reduit"}`
-      );
+      const slot = createElement("div", `slot ${STATES[value].cls}`);
       slot.dataset.day = String(day);
       slot.dataset.index = String(index);
       slot.style.left = `${(index / 48) * 100}%`;
@@ -955,10 +986,17 @@ class FrisquetScheduleCard extends HTMLElement {
     this._status = { ok: true, text: "Envoi en cours…" };
     this._render();
 
+    // Dans la chaudière, un créneau Hors gel reste en Réduit.
     const programmation = this._edit.data.map((ranges, day) => ({
       jour: day,
-      plages: ranges.slice(),
+      plages: ranges.map((value) => (value === 1 ? 1 : 0)),
     }));
+    const horsGel = this._supportsHorsGel
+      ? this._edit.data.map((ranges, day) => ({
+        jour: day,
+        plages: ranges.map((value) => (value === 2 ? 1 : 0)),
+      }))
+      : null;
 
     const service = this.config.service || "frisquet_connect.set_programmation";
     const [domain, serviceName] = service.split(".");
@@ -973,11 +1011,18 @@ class FrisquetScheduleCard extends HTMLElement {
         }
       );
 
+      if (horsGel) {
+        await this._hass.callService(domain || "frisquet_connect", "set_hors_gel", {
+          entity_id: this.config.entity,
+          hors_gel: horsGel,
+        });
+      }
+
       this._status = {
         ok: true,
         text: "Programmation envoyée à la chaudière",
       };
-      this._optimistic = programmation;
+      this._optimistic = { programmation, horsGel };
       this._editMode = false;
       this._edit = null;
     } catch (error) {
@@ -1004,7 +1049,7 @@ window.customCards.push({
   type: "frisquet-schedule-card",
   name: "Frisquet Schedule Card",
   description:
-    "Frise hebdomadaire interactive de la programmation Frisquet (Confort / Réduit)",
+    "Frise hebdomadaire interactive de la programmation Frisquet (Confort / Réduit / Hors gel)",
 });
 
 console.info(

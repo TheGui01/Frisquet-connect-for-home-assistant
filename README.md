@@ -56,6 +56,9 @@ Switch to OFF or Chauffe has no effect.<br>
 Each zone has 3 number entities ("Consigne Zone 1 Confort", "Consigne Zone 1 Réduit", "Consigne Zone 1 Hors gel") to set the temperature of each mode, whatever the current mode is (5 to 30 °C, 0.5 °C step). The thermostat entity only changes the setpoint of the active mode.<br>
 The boiler applies the new setpoint at its next sync with the Frisquet cloud (usually a few minutes).
 
+- Hors gel periods in the schedule :<br>
+The Frisquet schedule only knows Confort and Réduit; Hors gel is a mode. The schedule card has a third brush, "Hors gel", for 30-min slots kept by Home Assistant (service `frisquet_connect.set_hors_gel`, attribute `hors_gel` of the climate entity). At the start of a Hors gel period the zone switches to Hors gel, at the end it goes back to Auto. Only these two moments send an order: a mode chosen by hand during the period is kept, and a Hors gel set by hand is never cancelled. In the boiler schedule these slots stay in Réduit, which is the fallback if Home Assistant is stopped.
+
 - Consumption :<br>
 There are 2 sensors that retrieve total consumption (not on monthly basis).<br>
 You can add them into your energy dashboard to gas consumption. Value will appear 1 day you add them into it :<br>

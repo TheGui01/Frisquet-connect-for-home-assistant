@@ -15,8 +15,13 @@ from .const import (
     PLATFORMS,
 )
 from pathlib import Path
+import hashlib
 CARD_URL = "/frisquet_connect/frisquet-schedule-card.js"
 CARD_PATH = Path(__file__).parent / "www" / "frisquet-schedule-card.js"
+# Empreinte du fichier ajoutée à l'URL de la ressource : elle change à chaque
+# nouvelle version de la carte, ce qui force les navigateurs à la recharger.
+CARD_VERSION = hashlib.sha1(CARD_PATH.read_bytes()).hexdigest()[:8]
+CARD_RESOURCE_URL = f"{CARD_URL}?v={CARD_VERSION}"
 # from homeassistant.components.frontend import async_register_extra_module_url
 
 
@@ -63,31 +68,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
             return
 
-        existing_urls = {
-            resource.get("url")
+        existing = [
+            resource
             for resource in resources.async_items()
-            if resource.get("url")
-        }
+            if (resource.get("url") or "").split("?")[0] == CARD_URL
+        ]
 
-        if CARD_URL in existing_urls:
+        if any(resource.get("url") == CARD_RESOURCE_URL for resource in existing):
             _LOGGER.debug(
                 "La ressource Lovelace %s est déjà enregistrée.",
-                CARD_URL,
+                CARD_RESOURCE_URL,
             )
             return
 
-        hass.async_create_task(
-            resources.async_create_item(
-                {
-                    "res_type": "module",
-                    "url": CARD_URL,
-                }
+        if existing:
+            # Nouvelle version de la carte : mettre à jour l'URL existante
+            # plutôt que d'ajouter une seconde ressource.
+            if not hasattr(resources, "async_update_item"):
+                return
+            hass.async_create_task(
+                resources.async_update_item(
+                    existing[0]["id"],
+                    {"res_type": "module", "url": CARD_RESOURCE_URL},
+                )
             )
-        )
+        else:
+            hass.async_create_task(
+                resources.async_create_item(
+                    {
+                        "res_type": "module",
+                        "url": CARD_RESOURCE_URL,
+                    }
+                )
+            )
 
         _LOGGER.info(
             "Ressource Lovelace %s enregistrée pour la carte Frisquet.",
-            CARD_URL,
+            CARD_RESOURCE_URL,
         )
 
     hass.bus.async_listen_once(
@@ -133,6 +150,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Démarre la première mise à jour et attends qu'elle soit terminée
     await coordinator.async_config_entry_first_refresh()
 
+    # Plages Hors gel gardées par Home Assistant (voir hors_gel.py)
+    from .hors_gel import FrisquetHorsGel
+    coordinator.frisquet_hors_gel = FrisquetHorsGel(hass, entry, coordinator)
+    await coordinator.frisquet_hors_gel.async_start()
+    entry.async_on_unload(coordinator.frisquet_hors_gel.async_stop)
+
     # Charge les plateformes
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -162,6 +185,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     if not hass.data.get(DOMAIN):
         hass.services.async_remove(DOMAIN, "set_programmation")
+        hass.services.async_remove(DOMAIN, "set_hors_gel")
 
     return unload_ok
 
