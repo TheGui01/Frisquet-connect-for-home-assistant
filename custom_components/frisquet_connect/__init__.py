@@ -15,8 +15,13 @@ from .const import (
     PLATFORMS,
 )
 from pathlib import Path
+import hashlib
 CARD_URL = "/frisquet_connect/frisquet-schedule-card.js"
 CARD_PATH = Path(__file__).parent / "www" / "frisquet-schedule-card.js"
+# Empreinte du fichier ajoutée à l'URL de la ressource : elle change à chaque
+# nouvelle version de la carte, ce qui force les navigateurs à la recharger.
+CARD_VERSION = hashlib.sha1(CARD_PATH.read_bytes()).hexdigest()[:8]
+CARD_RESOURCE_URL = f"{CARD_URL}?v={CARD_VERSION}"
 # from homeassistant.components.frontend import async_register_extra_module_url
 
 
@@ -63,31 +68,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
             return
 
-        existing_urls = {
-            resource.get("url")
+        existing = [
+            resource
             for resource in resources.async_items()
-            if resource.get("url")
-        }
+            if (resource.get("url") or "").split("?")[0] == CARD_URL
+        ]
 
-        if CARD_URL in existing_urls:
+        if any(resource.get("url") == CARD_RESOURCE_URL for resource in existing):
             _LOGGER.debug(
                 "La ressource Lovelace %s est déjà enregistrée.",
-                CARD_URL,
+                CARD_RESOURCE_URL,
             )
             return
 
-        hass.async_create_task(
-            resources.async_create_item(
-                {
-                    "res_type": "module",
-                    "url": CARD_URL,
-                }
+        if existing:
+            # Nouvelle version de la carte : mettre à jour l'URL existante
+            # plutôt que d'ajouter une seconde ressource.
+            if not hasattr(resources, "async_update_item"):
+                return
+            hass.async_create_task(
+                resources.async_update_item(
+                    existing[0]["id"],
+                    {"res_type": "module", "url": CARD_RESOURCE_URL},
+                )
             )
-        )
+        else:
+            hass.async_create_task(
+                resources.async_create_item(
+                    {
+                        "res_type": "module",
+                        "url": CARD_RESOURCE_URL,
+                    }
+                )
+            )
 
         _LOGGER.info(
             "Ressource Lovelace %s enregistrée pour la carte Frisquet.",
-            CARD_URL,
+            CARD_RESOURCE_URL,
         )
 
     hass.bus.async_listen_once(
