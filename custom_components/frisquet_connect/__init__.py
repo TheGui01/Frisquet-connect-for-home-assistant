@@ -133,6 +133,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Démarre la première mise à jour et attends qu'elle soit terminée
     await coordinator.async_config_entry_first_refresh()
 
+    # Plages Hors gel gardées par Home Assistant (voir hors_gel.py)
+    from .hors_gel import FrisquetHorsGel
+    coordinator.frisquet_hors_gel = FrisquetHorsGel(hass, entry, coordinator)
+    await coordinator.frisquet_hors_gel.async_start()
+    entry.async_on_unload(coordinator.frisquet_hors_gel.async_stop)
+
     # Charge les plateformes
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -162,6 +168,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     if not hass.data.get(DOMAIN):
         hass.services.async_remove(DOMAIN, "set_programmation")
+        hass.services.async_remove(DOMAIN, "set_hors_gel")
 
     return unload_ok
 

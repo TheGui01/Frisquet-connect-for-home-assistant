@@ -139,9 +139,13 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
 
     @property
     def extra_state_attributes(self) -> dict:
-        return {
-        "programmation": self.coordinator.data[self.idx].get("programmation", [])
+        attributes = {
+            "programmation": self.coordinator.data[self.idx].get("programmation", [])
         }
+        hors_gel = getattr(self.coordinator, "frisquet_hors_gel", None)
+        if hors_gel is not None and hors_gel.programmation(self.idx) is not None:
+            attributes["hors_gel"] = hors_gel.programmation(self.idx)
+        return attributes
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -434,7 +438,8 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
         Sans cela, SELECTEUR / DERO / consignes restent à leur ancienne
         valeur jusqu'à la prochaine lecture de l'API (cache de 15 min) :
         l'entité climate et les entités number affichaient l'ancienne
-        consigne après un changement.
+        consigne après un changement, et les plages Hors gel
+        (hors_gel.py) se seraient fiées à un mode périmé.
         """
         data = self.coordinator.data.get(self.idx)
         if data is None:
