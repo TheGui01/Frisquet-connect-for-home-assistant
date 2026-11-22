@@ -52,6 +52,10 @@ Switch to OFF or Chauffe has no effect.<br>
 
     - Boost Mode available
 
+- Setpoints (Confort, Réduit, Hors gel) :<br>
+Each zone has 3 number entities ("Consigne Zone 1 Confort", "Consigne Zone 1 Réduit", "Consigne Zone 1 Hors gel") to set the temperature of each mode, whatever the current mode is (5 to 30 °C, 0.5 °C step). The thermostat entity only changes the setpoint of the active mode.<br>
+The boiler applies the new setpoint at its next sync with the Frisquet cloud (usually a few minutes).
+
 - Consumption :<br>
 There are 2 sensors that retrieve total consumption (not on monthly basis).<br>
 You can add them into your energy dashboard to gas consumption. Value will appear 1 day you add them into it :<br>

@@ -75,6 +75,49 @@ async def _post_ordre(url: str, order: list) -> int:
             return resp.status
 
 
+async def async_send_order(hass: HomeAssistant, entry, coordinator, zone_key: str, order: list) -> None:
+    """Envoie une liste d'ordres à l'API Frisquet pour une zone.
+
+    Ré-authentifie une fois si le token a expiré et lève HomeAssistantError
+    si l'API refuse l'ordre.
+    """
+    zone_data = (coordinator.data or {}).get(zone_key) or {}
+    identifiant_chaudiere = zone_data.get("identifiant_chaudiere")
+    token = zone_data.get("token")
+    if not (identifiant_chaudiere and token):
+        raise HomeAssistantError(
+            "Token / identifiants absents des données du coordinator"
+        )
+
+    url = f"{ORDER_API}{identifiant_chaudiere}?token={token}"
+    _LOGGER.debug("Envoi ordre %s", [o["cle"] for o in order])
+    status = await _post_ordre(url, order)
+
+    # Token expiré -> ré-authentification puis nouvel essai.
+    if status in (401, 403):
+        _LOGGER.info("Token Frisquet expiré, ré-authentification")
+        from .frisquetAPI import FrisquetGetInfo  # import tardif
+        api = FrisquetGetInfo(hass, entry.data)
+        auth = await api.api_auth(
+            entry.data.get("email"), entry.data.get("password")
+        )
+        token = auth.get("token")
+        if not token:
+            raise HomeAssistantError("Ré-authentification Frisquet échouée")
+        # Rafraîchir le token dans le coordinator.
+        for key in ("zone1", "zone2", "zone3"):
+            if key in coordinator.data:
+                coordinator.data[key]["token"] = token
+        coordinator.data["token"] = token
+        url = f"{ORDER_API}{identifiant_chaudiere}?token={token}"
+        status = await _post_ordre(url, order)
+
+    if status not in (200, 201):
+        raise HomeAssistantError(
+            f"Envoi refusé par l'API Frisquet (HTTP {status})"
+        )
+
+
 async def async_setup_services(hass: HomeAssistant) -> None:
     if hass.services.has_service(DOMAIN, "set_programmation"):
         return
@@ -111,49 +154,20 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         if zone_data is None:
             raise HomeAssistantError(f"Zone introuvable pour {entity_id}")
 
-        identifiant_chaudiere = zone_data.get("identifiant_chaudiere")
         zone_identifiant = zone_data.get("identifiant")  # ex. "Z1"
-        token = zone_data.get("token")
-        if not (identifiant_chaudiere and zone_identifiant and token):
-            raise HomeAssistantError(
-                "Token / identifiants absents des données du coordinator"
-            )
+        if not zone_identifiant:
+            raise HomeAssistantError(f"Identifiant de zone absent pour {entity_id}")
 
         # 3. L'ordre PROGRAMME_{zone} : la valeur est le JSON sérialisé
         #    de la liste des jours (comme le fait l'app Android).
+        #    Ré-authentification gérée par async_send_order.
         order = [{
             "cle": f"PROGRAMME_{zone_identifiant}",
             "valeur": json.dumps(programmation),
         }]
-        url = f"{ORDER_API}{identifiant_chaudiere}?token={token}"
-        _LOGGER.debug("Envoi programmation %s : %s", zone_identifiant, url)
+        await async_send_order(hass, entry, coordinator, zone_key, order)
 
-        status = await _post_ordre(url, order)
-
-        # 4. Token expiré -> ré-authentification puis nouvel essai.
-        if status in (401, 403):
-            _LOGGER.info("Token Frisquet expiré, ré-authentification")
-            from .frisquetAPI import FrisquetGetInfo  # import tardif
-            api = FrisquetGetInfo(hass, entry.data)
-            auth = await api.api_auth(
-                entry.data.get("email"), entry.data.get("password")
-            )
-            token = auth.get("token")
-            if not token:
-                raise HomeAssistantError("Ré-authentification Frisquet échouée")
-            # Rafraîchir le token dans le coordinator.
-            if zone_key in coordinator.data:
-                coordinator.data[zone_key]["token"] = token
-            coordinator.data["token"] = token
-            url = f"{ORDER_API}{identifiant_chaudiere}?token={token}"
-            status = await _post_ordre(url, order)
-
-        if status not in (200, 201):
-            raise HomeAssistantError(
-                f"Envoi refusé par l'API Frisquet (HTTP {status})"
-            )
-
-        # 5. Forcer une mise à jour pour que l'entité (et la carte)
+        # 4. Forcer une mise à jour pour que l'entité (et la carte)
         # reflètent la nouvelle programmation sans attendre les 15 min.
         await coordinator.async_request_refresh()
 
