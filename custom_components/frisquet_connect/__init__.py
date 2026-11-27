@@ -36,15 +36,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Création des entités à partir d'une configEntry."""
     _LOGGER.debug("In async_setup_entry __init__.py")
 
-    await hass.http.async_register_static_paths(
-        [
-            StaticPathConfig(
-                url_path=CARD_URL,
-                path=str(CARD_PATH),
-                cache_headers=False,
-            )
-        ]
-    )
+    if not hass.data.get("frisquet_connect_card_registered"):
+        hass.data["frisquet_connect_card_registered"] = True
+        await hass.http.async_register_static_paths(
+            [
+                StaticPathConfig(
+                    url_path=CARD_URL,
+                    path=str(CARD_PATH),
+                    cache_headers=False,
+                )
+            ]
+        )
 
     @callback
     def _async_register_schedule_card_resource(event: Event) -> None:
