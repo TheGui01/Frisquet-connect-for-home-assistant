@@ -19,7 +19,7 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           TAG_VERSION="${TAG#v}"
-          MANIFEST_VERSION="$(jq -r '.version' manifest.json)"
+          MANIFEST_VERSION="$(jq -r '.version' custom_components/frisquet_connect/manifest.json)"
 
           echo "Tag de la release : $TAG_VERSION"
           echo "Version du manifest : $MANIFEST_VERSION"
