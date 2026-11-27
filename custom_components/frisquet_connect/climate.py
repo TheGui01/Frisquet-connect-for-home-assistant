@@ -106,9 +106,9 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             self._attr_name = self.coordinator.data[self.idx]["nom"]
         else:
             self._attr_name = f"{site_name} {self.coordinator.data[self.idx]['nom']}"
-        self._attr_native_temperature_unit  = "°C"
-        self._attr_native_target_temperature_low  = 5
-        self._attr_native_target_temperature_high  = 25
+        self._attr_native_temperature_unit = "°C"
+        self._attr_native_target_temperature_low = 5
+        self._attr_native_target_temperature_high = 25
         self._attr_hvac_modes = [HVACMode.HEAT, HVACMode.AUTO, HVACMode.OFF]
         self._attr_preset_modes = self.DefineavAilablePresetmodes(
             self.coordinator.data[self.idx]["boost_disponible"])
@@ -298,10 +298,10 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
 
         if _key == "MODE_DERO" or preset_mode == 'confort_permanent' or preset_mode == 'confort_permanent' or preset_mode == 'hors_gel':
             self.hvac_mode = self.modeFrisquetToHVAC(
-                0, True, preset_mode, self.coordinator.data[self.idx]["CAMB"]/10, self._attr_current_temperature)
+                0, True, preset_mode, self.coordinator.data[self.idx]["CAMB"]/10, self._attr_native_target_temperature)
         else:
             self.hvac_mode = self.modeFrisquetToHVAC(
-                0, self.coordinator.data[self.idx]["DERO"], preset_mode, self.coordinator.data[self.idx]["CAMB"]/10, self._attr_current_temperature)
+                0, self.coordinator.data[self.idx]["DERO"], preset_mode, self.coordinator.data[self.idx]["CAMB"]/10, self._attr_native_target_temperature)
 
         self._attr_preset_mode = preset_mode
         self.async_write_ha_state()
@@ -424,7 +424,6 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
                             _LOGGER.debug("ORDRE_EN_ATTENTE")
                             continue
 
-
                     elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
                         # Newood Add:
                         _LOGGER.debug("WebSocket closed/error")
@@ -504,6 +503,5 @@ class FrisquetConnectEntity(ClimateEntity, CoordinatorEntity):
             # water_heater.py appelle aussi cette méthode avec sa propre instance.
             if resp.status in (200, 201) and isinstance(self, FrisquetConnectEntity):
                 self._reflect_order(key, int(valeur))
-
 
         asyncio.create_task(FrisquetConnectEntity.websocket_confirmation(self))

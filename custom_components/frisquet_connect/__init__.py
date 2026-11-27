@@ -2,11 +2,11 @@
 from .frisquetAPI import FrisquetGetInfo
 from homeassistant.components.http import StaticPathConfig
 import logging
-
+import voluptuous as vol
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 
 import asyncio
-from homeassistant.core import HomeAssistant, Event, callback
+from homeassistant.core import HomeAssistant, Event, callback, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import timedelta
@@ -25,11 +25,11 @@ CARD_RESOURCE_URL = f"{CARD_URL}?v={CARD_VERSION}"
 # from homeassistant.components.frontend import async_register_extra_module_url
 
 
-_LOGGER = logging.getLogger(__name__)
-
 """Initialisation du package de l'intégration Frisquet Connect"""
 
 _LOGGER = logging.getLogger(__name__)
+SERVICE_RELOAD = "reload"
+RELOAD_SCHEMA = vol.Schema({})
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -164,6 +164,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from .service import async_setup_services
     await async_setup_services(hass)
 
+    async def async_handle_reload(call: ServiceCall) -> None:
+        """Recharge l'intégration Frisquet Connect."""
+        _LOGGER.info("Rechargement de Frisquet Connect demandé")
+        await hass.config_entries.async_reload(entry.entry_id)
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_RELOAD,
+        async_handle_reload,
+        schema=RELOAD_SCHEMA,
+    )
+
     return True
 
 
@@ -188,17 +200,14 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not hass.data.get(DOMAIN):
         hass.services.async_remove(DOMAIN, "set_programmation")
         hass.services.async_remove(DOMAIN, "set_hors_gel")
+        hass.services.async_remove(DOMAIN, SERVICE_RELOAD)
 
     return unload_ok
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload the config entry."""
-   # Appelle async_unload_entry puis async_setup_entry pour recharger
-    for entry in PLATFORMS:
-        await async_unload_entry(hass, entry)
-
-    await async_setup_entry(hass, entry)
+    """Recharge l'entrée de configuration Frisquet Connect."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
