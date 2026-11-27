@@ -19,13 +19,14 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           TAG_VERSION="${TAG#v}"
-          MANIFEST_VERSION="$(jq -r '.version' custom_components/frisquet_connect/manifest.json)"
+          MANIFEST_PATH="custom_components/frisquet_connect/manifest.json"
+          MANIFEST_VERSION="$(jq -r '.version' "$MANIFEST_PATH")"
 
           echo "Tag de la release : $TAG_VERSION"
           echo "Version du manifest : $MANIFEST_VERSION"
 
           if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
-            echo "::error file=manifest.json::La version du manifest ($MANIFEST_VERSION) ne correspond pas au tag ($TAG_VERSION)."
+            echo "::error file=$MANIFEST_PATH::La version du manifest ($MANIFEST_VERSION) ne correspond pas au tag ($TAG_VERSION)."
             exit 1
           fi
 
